@@ -1,30 +1,21 @@
 cmake_minimum_required( VERSION 2.8 ) 
 project ( SNAP-visual-audio-engine )
+# Get the required packages
 find_package( OpenCV REQUIRED )
 find_package( OpenAL REQUIRED )
-
-set( NAME_SRC
-    src/main.cpp
-	src/BlenderToDepthMapDLL.cpp
-	src/stdafx.cpp
-)
-
-set( NAME_HEADERS       
-     include/BlenderToDepthMapDLL.h
-	 include/stdafx.h
-	 include/targetver.h
-)
-
+# Set project include directory
 include_directories( 
-	${CMAKE_CURRENT_SOURCE_DIR}/include
+	include
 	${OpenCV_INCLUDE_DIRS}
 	${OPENAL_INCLUDE_DIR}
 )
-
-link_directories( ${CMAKE_BINARY_DIR}/bin)
-
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-
-add_executable( ${PROJECT_NAME} ${NAME_SRC} ${NAME_HEADERS} )
-
+# Set project source directory
+file(GLOB SOURCES "src/*.cpp")
+# Set the name of the executable
+add_executable( ${PROJECT_NAME} ${SOURCES} )
+# Set the libaraies to link with the project
 target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${OPENAL_LIBRARY})
+
+add_custom_command (TARGET SNAP-visual-audio-engine POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/../bin/opencv_world340d.dll ${CMAKE_BINARY_DIR}
+)
