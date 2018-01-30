@@ -6,7 +6,7 @@
 
 //#ifdef _WIN32
 
-#include "stdafx.h"
+#include "..\include\stdafx.h"
 #include <fstream>
 #include <iostream>
 #define BUF_SIZE 4*640*480+4
