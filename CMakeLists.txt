@@ -1,5 +1,5 @@
-cmake_minimum_required( VERSION 2.8 ) 
-project ( SNAP-visual-audio-engine )
+cmake_minimum_required( VERSION 3.0 FATAL_ERROR)
+project ( SNAP-visual-audio-engine VERSION 0.1 LANGUAGES CXX)
 # Get the required packages
 find_package( OpenCV REQUIRED )
 find_package( OpenAL REQUIRED )
@@ -16,6 +16,11 @@ add_executable( ${PROJECT_NAME} ${SOURCES} )
 # Set the libaraies to link with the project
 target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${OPENAL_LIBRARY})
 
-add_custom_command (TARGET SNAP-visual-audio-engine POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/../bin/opencv_world340d.dll ${CMAKE_BINARY_DIR}
-)
+MACRO (COPY_DLL trgt libname)
+        ADD_CUSTOM_COMMAND (
+        TARGET ${trgt}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        ARGS -E copy "${OPENCVDIR/bin}/${libname}.dll" ${CMAKE_CURRENT_BINARY_DIR}
+    )
+ENDMACRO (COPY_DLL)
