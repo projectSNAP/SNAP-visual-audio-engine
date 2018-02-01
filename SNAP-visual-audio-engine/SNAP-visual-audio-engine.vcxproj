@@ -71,11 +71,13 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="visual_audio_engine.cpp" />
     <ClCompile Include="BlenderToDepthMapDLL.cpp" />
     <ClCompile Include="SONARBackEnd.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="visual_audio_engine.h" />
     <ClInclude Include="BlenderToDepthMapDLL.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
