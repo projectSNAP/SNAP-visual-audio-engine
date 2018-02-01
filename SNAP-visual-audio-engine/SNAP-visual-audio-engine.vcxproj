@@ -47,6 +47,13 @@
       <AdditionalLibraryDirectories>"$(OPENCV_DIR)\lib";"$(OPENAL_DIR)\libs\Win64";"$(OPENAL_DIR)\include";%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world340d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(OPENCV_DIR)\bin\opencv_world340d.dll" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the opencv_world340.dll to the Outdir</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -56,6 +63,18 @@
       <AdditionalLibraryDirectories>"$(OPENCV_DIR)\lib";"$(OPENAL_DIR)\libs\Win64";"$(OPENAL_DIR)\include";%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world340.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if $(ConfigurationName) == Release (
+xcopy /y /d "$(OPENCV_DIR)\bin\opencv_world340.dll" "$(OutDir)"
+)
+if $(ConfigurationName) == Debug (
+xcopy /y /d "$(OPENCV_DIR)\bin\opencv_world340d.dll" "$(OutDir)"
+)
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the opencv_world340.dll to the Outdir</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BlenderToDepthMapDLL.cpp" />
