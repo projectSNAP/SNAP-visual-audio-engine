@@ -1,3 +1,0 @@
-/home/dustin/schoolspace/capstone/SNAP-visual-audio-engine/CMakeFiles/rebuild_cache.dir
-/home/dustin/schoolspace/capstone/SNAP-visual-audio-engine/CMakeFiles/SNAP-visual-audio-engine.dir
-/home/dustin/schoolspace/capstone/SNAP-visual-audio-engine/CMakeFiles/edit_cache.dir
