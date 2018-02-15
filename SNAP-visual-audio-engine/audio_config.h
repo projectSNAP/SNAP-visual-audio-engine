@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+
+using namespace std;
+
 class audio_config
 {
 public:
@@ -11,7 +15,5 @@ public:
 	float audioSpreadDeg;
 	float audioVolRollOff;
 	audio_config();
-	~audio_config();
-	void loadConfigs();
+	void load(string filePath);
 };
-
