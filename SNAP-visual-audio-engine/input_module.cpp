@@ -1,7 +1,5 @@
 #include "input_module.h"
 
-
-
 input_module::input_module()
 {
 	frameX = 0;

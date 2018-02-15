@@ -74,6 +74,7 @@
     <ClCompile Include="audio_config.cpp" />
     <ClCompile Include="input_module.cpp" />
     <ClCompile Include="BlenderToDepthMapDLL.cpp" />
+    <ClCompile Include="shared_mem_input.cpp" />
     <ClCompile Include="SONARBackEnd.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
@@ -81,6 +82,7 @@
     <ClInclude Include="audio_config.h" />
     <ClInclude Include="input_module.h" />
     <ClInclude Include="BlenderToDepthMapDLL.h" />
+    <ClInclude Include="shared_mem_input.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
