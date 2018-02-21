@@ -76,7 +76,6 @@
     <ClCompile Include="BlenderToDepthMapDLL.cpp" />
     <ClCompile Include="openal_module.cpp" />
     <ClCompile Include="shared_mem_input.cpp" />
-    <ClCompile Include="SONARBackEnd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
