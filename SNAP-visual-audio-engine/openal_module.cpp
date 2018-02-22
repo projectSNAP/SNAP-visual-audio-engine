@@ -3,23 +3,6 @@
 #include "stdafx.h"
 #include "openal_module.h"
 
-float calc_longitude(float x, float y, float z)
-{
-	// TODO
-	return float();
-}
-float calc_latitude(float x, float y, float z) 
-{
-	// TODO
-	return float();
-}
-float deg_to_rad(float x) {
-	return x * M_PI / 180;
-}
-float rad_to_deg(float x) {
-	return x * 180 / M_PI;
-}
-
 /**
  * @brief      OpenAL specific error handling defines
  */
@@ -180,4 +163,21 @@ void openal_module::move_source(ALuint source, float latitude, float longitude)
 	// if new position is outside bounds, set new position to bounds
 	// TODO: figure out how to keep latitude and longitude within bounds
 	// of field-of-view.
+}
+
+float calc_longitude(float x, float y, float z)
+{
+	// TODO
+	return float();
+}
+float calc_latitude(float x, float y, float z)
+{
+	// TODO
+	return float();
+}
+float deg_to_rad(float x) {
+	return x * M_PI / 180;
+}
+float rad_to_deg(float x) {
+	return x * 180 / M_PI;
 }
