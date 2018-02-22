@@ -293,6 +293,7 @@ int main()
 
 		sourceMatCoords[i] = xPix;
 
+		// Add buffers to each source and set properties
 		alSourcei(srclist[i], AL_BUFFER, buf[i]);
 		alSourcef(srclist[i], AL_REFERENCE_DISTANCE, 1.0f);
 		alSourcei(srclist[i], AL_SOURCE_RELATIVE, AL_TRUE);
@@ -393,7 +394,7 @@ int main()
 		//End openAL stuff-------------------------------------------
 
 		horizpos++;
-
+		// Wait for the tick delay
 		delay = ((getTickCount() - delayTick) * 1000) / getTickFrequency();
 		while (delay < stepDelay) { delay = ((getTickCount() - delayTick) * 1000) / getTickFrequency(); }
 	}
