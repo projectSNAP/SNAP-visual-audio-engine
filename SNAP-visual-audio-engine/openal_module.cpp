@@ -83,10 +83,10 @@ openal_module::~openal_module()
 	al_check_error();
 }
 
+void openal_module::create_buffers() {
 // TODO: add the ability to create buffers of varying waveforms
 // such as "more scratchy sounding"
-void openal_module::create_buffers() {}
-
+}
 
 /**
  * @brief      Creates sources.
@@ -165,19 +165,19 @@ void openal_module::move_source(ALuint source, float latitude, float longitude)
 	// of field-of-view.
 }
 
-float calc_longitude(float x, float y, float z)
+float openal_module::calc_longitude(float x, float y, float z)
 {
 	// TODO
 	return float();
 }
-float calc_latitude(float x, float y, float z)
+float openal_module::calc_latitude(float x, float y, float z)
 {
 	// TODO
 	return float();
 }
-float deg_to_rad(float x) {
+float openal_module::deg_to_rad(float x) {
 	return x * M_PI / 180;
 }
-float rad_to_deg(float x) {
+float openal_module::rad_to_deg(float x) {
 	return x * 180 / M_PI;
 }
