@@ -37,10 +37,11 @@ const char* al_err_str(ALenum err) {
  * @param[in]  height  The height of the frame.
  * @param[in]  FOV     The field-of-view of the frame.
  */
-openal_module::openal_module(int count = 16, int width = 1920, int height = 1080, float FOV = 90.0)
+openal_module::openal_module(int width, int height, float FOV)
 {
 	// Set Globals
-	sourceCount = count;
+	sourceCount = 0;
+	bufferCount = 0;
 	frameWidth = width;
 	frameHeight = height;
 	horizontalFOV = FOV;
@@ -49,6 +50,7 @@ openal_module::openal_module(int count = 16, int width = 1920, int height = 1080
 	device = NULL;
 	context = NULL;
 	sources = NULL;
+	buffers = NULL;
 	sourceMatCoords = NULL;
 	// Create OpenAL device
 	const char *defname = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
@@ -83,25 +85,41 @@ openal_module::~openal_module()
 	al_check_error();
 }
 
-void openal_module::create_buffers() {
+
 // TODO: add the ability to create buffers of varying waveforms
-// such as "more scratchy sounding"
+void openal_module::init_sine_buffers(int count, float seconds, float sampleRate, float amplitude, float amplDelta, float frequency, float freqDelta) {
+	bufferCount = count;
+	buffers = new ALuint[bufferCount];
+	alGenBuffers(bufferCount, buffers);
+	int bufferSize = abs(seconds * sampleRate);
+	short *samples = new short[bufferSize];
+	for (int buffer = 0; buffer < bufferCount; buffer++) {
+		for (int i = 0; i < bufferSize; ++i) {
+			samples[i] = 16380 * sin((2.f * float(M_PI) * frequency) / sampleRate * i) * amplitude;
+		}
+		amplitude = amplitude * amplDelta;
+		frequency = frequency * freqDelta;
+		/* Download buffer to OpenAL */
+		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, bufferSize * 2, sampleRate);
+		al_check_error();
+	}
 }
 
 /**
  * @brief      Creates sources.
  */
-void openal_module::create_sources()
+void openal_module::init_sources(int count)
 {
+	sourceCount = count;
 	sources = new ALuint[sourceCount];
-	sourceMatCoords = new int[sourceCount];
 	alGenSources(sourceCount, sources);
+	sourceMatCoords = new int[sourceCount];
 	al_check_error();
 	// Set the vertical positions of all the sources.
 	for (int i = 0; i < sourceCount; ++i) {
 		// Calculate where the sournce would fall on the image matrix
 		sourceMatCoords[i] = (frameHeight / (sourceCount * 2)) + (frameHeight / sourceCount) * i;
-		// Set the proper
+		// Set the proper flags
 		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 1.0f);
 		al_check_error();
 		alSourcei(sources[i], AL_SOURCE_RELATIVE, AL_TRUE);
@@ -113,16 +131,24 @@ void openal_module::create_sources()
 	}
 }
 
+const unsigned int *openal_module::get_sources() {
+	return sources;
+}
+
+const unsigned int *openal_module::get_buffers() {
+	return sources;
+}
+
 /**
  * @brief      Adds a buffer to a source.
  *
  * @param[in]  buffer  The buffer
  * @param[in]  source  The source
  */
-void openal_module::buffer_source(ALuint buffer, ALuint source)
+void openal_module::source_set_buffer(int source, int buffer)
 {
 	// Add buffers to each source and set properties
-	alSourcei(source, AL_BUFFER, buffer);
+	alSourcei(sources[source], AL_BUFFER, buffers[buffer]);
 	al_check_error();
 }
 
@@ -131,11 +157,24 @@ void openal_module::buffer_source(ALuint buffer, ALuint source)
  *
  * @param[in]  source  The source
  */
-void openal_module::play_source(ALuint source)
+void openal_module::source_play(int source)
 {
-	alSourcePlay(source);
+	alSourcePlay(sources[source]);
 	al_check_error();
 }
+
+void openal_module::source_stop(int source)
+{
+	alSourceStop(sources[source]);
+	al_check_error();
+}
+
+void openal_module::source_pause(int source)
+{
+	alSourcePause(sources[source]);
+	al_check_error();
+}
+
 
 /**
  * @brief      Moves a source around within the bounds of the FOV.
@@ -144,7 +183,7 @@ void openal_module::play_source(ALuint source)
  * @param[in]  latitude   The latitude in radians
  * @param[in]  longitude  The longitude in radians
  */
-void openal_module::move_source(ALuint source, float latitude, float longitude)
+void openal_module::source_move(int source, float latitude, float longitude)
 {
 	// normalize latitude and longitude
 	latitude = fmod(latitude, float(2 * M_PI));
