@@ -7,7 +7,7 @@ class openal_module
 public:
 	openal_module(int width = 1920, int height = 1080, float FOV = 90.0);
 	~openal_module();
-	void init_sine_buffers(int count, float seconds, float sampleRate, float amplitude, float amplDelta, float frequency, float freqDelta);
+	void init_sine_buffers(int count, int sampleRate, float amplitude, int frequency);
 	void init_sources(int count);
 	const unsigned int *get_sources();
 	const unsigned int *get_buffers();
@@ -16,6 +16,9 @@ public:
 	void source_stop(int source);
 	void source_pause(int source);
 	void source_move(int source, float latitude, float longitude);
+	void source_add_pitch(int source, float addPitch);
+	void source_set_pitch(int source, float addPitch);
+
 protected:
 	int sourceCount;
 	int bufferCount;

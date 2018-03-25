@@ -2,6 +2,7 @@
 #include <cmath> // Trigonometric functions
 #include "stdafx.h"
 #include "openal_module.h"
+#include <limits.h> // SHRT_MAX
 
 /**
  * @brief      OpenAL specific error handling defines
@@ -87,20 +88,17 @@ openal_module::~openal_module()
 
 
 // TODO: add the ability to create buffers of varying waveforms
-void openal_module::init_sine_buffers(int count, float seconds, float sampleRate, float amplitude, float amplDelta, float frequency, float freqDelta) {
+
+void openal_module::init_sine_buffers(int count, int sampleRate, float amplitude, int frequency) {
 	bufferCount = count;
 	buffers = new ALuint[bufferCount];
 	alGenBuffers(bufferCount, buffers);
-	int bufferSize = abs(seconds * sampleRate);
-	short *samples = new short[bufferSize];
+	short *samples = new short[sampleRate];
 	for (int buffer = 0; buffer < bufferCount; buffer++) {
-		for (int i = 0; i < bufferSize; ++i) {
-			samples[i] = 16380 * sin((2.f * float(M_PI) * frequency) / sampleRate * i) * amplitude;
+		for (int i = 0; i < sampleRate; ++i) {
+			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * frequency / sampleRate));
 		}
-		amplitude = amplitude * amplDelta;
-		frequency = frequency * freqDelta;
-		/* Download buffer to OpenAL */
-		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, bufferSize * 2, sampleRate);
+		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleRate * sizeof(short), sampleRate);
 		al_check_error();
 	}
 }
@@ -175,6 +173,19 @@ void openal_module::source_pause(int source)
 	al_check_error();
 }
 
+void openal_module::source_add_pitch(int source, float addPitch) {
+	ALfloat currentPitch;
+	alGetSourcef(sources[source], AL_PITCH, &currentPitch);
+	al_check_error();
+	currentPitch += addPitch;
+	alSourcef(sources[source], AL_PITCH, currentPitch);
+	al_check_error();
+}
+
+void openal_module::source_set_pitch(int source, float pitch) {
+	alSourcef(sources[source], AL_PITCH, pitch);
+	al_check_error();
+}
 
 /**
  * @brief      Moves a source around within the bounds of the FOV.
