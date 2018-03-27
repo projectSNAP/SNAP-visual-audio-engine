@@ -16,8 +16,18 @@ public:
 	void source_stop(int source);
 	void source_pause(int source);
 	void source_move(int source, float latitude, float longitude);
+	void source_set_pos(int source, float x, float y, float z);
 	void source_add_pitch(int source, float addPitch);
 	void source_set_pitch(int source, float addPitch);
+
+	float cartesian_to_spherical_rho(float x, float y, float z);
+	float cartesian_to_spherical_theta(float x, float y, float z);
+	float cartesian_to_spherical_phi(float x, float y, float z);
+	void cartesian_to_spherical(float x, float y, float z, float *rho, float *theta, float *phi);
+	void spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z);
+	float deg_to_rad(float x);
+	float rad_to_deg(float x);
+	float remove_negative_zero(float num);
 
 protected:
 	int sourceCount;
@@ -34,6 +44,6 @@ protected:
 	int *sourceMatCoords;
 	float calc_longitude(float x, float y, float z);
 	float calc_latitude(float x, float y, float z);
-	float deg_to_rad(float x);
-	float rad_to_deg(float x);
+
+
 };

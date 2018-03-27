@@ -66,7 +66,7 @@ openal_module::openal_module(int width, int height, float FOV)
 	// x+ = right, y+ = up, z+ = forward
 	// see https://www.openal.org/documentation/OpenAL_Programmers_Guide.pdf
 	// for info on listener orientation
-	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+	ALfloat listenerOri[] = { 0.f, 0.f, 1.f, 0.f, 1.f, 0.f };
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, listenerOri);
@@ -118,13 +118,13 @@ void openal_module::init_sources(int count)
 		// Calculate where the sournce would fall on the image matrix
 		sourceMatCoords[i] = (frameHeight / (sourceCount * 2)) + (frameHeight / sourceCount) * i;
 		// Set the proper flags
-		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 1.0f);
+		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 1.f);
 		al_check_error();
 		alSourcei(sources[i], AL_SOURCE_RELATIVE, AL_TRUE);
 		al_check_error();
 		alSourcei(sources[i], AL_LOOPING, AL_TRUE);
 		al_check_error();
-		alSource3f(sources[i], AL_POSITION, -2, 0, 1);
+		alSource3f(sources[i], AL_POSITION, 1, 0, 1);
 		al_check_error();
 	}
 }
@@ -194,40 +194,91 @@ void openal_module::source_set_pitch(int source, float pitch) {
  * @param[in]  latitude   The latitude in radians
  * @param[in]  longitude  The longitude in radians
  */
-void openal_module::source_move(int source, float latitude, float longitude)
+void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
 {
-	// normalize latitude and longitude
-	latitude = fmod(latitude, float(2 * M_PI));
-	longitude = fmod(longitude, float(2 * M_PI));
 	// get position of source
-	ALfloat *oldX;
-	ALfloat *oldY;
-	ALfloat *oldZ;
-	alGetSource3f(source, AL_POSITION, oldX, oldY, oldZ);
-	// calculate new position with MATH :o
-	float newLat = calc_latitude(*oldX, *oldY, *oldZ) + latitude;
-	float newLon = calc_longitude(*oldX, *oldY, *oldZ) + longitude;
-	float newX = cos(newLon) * sin(newLat);
-	float newY = sin(newLon) * sin(newLat);
-	float newZ = cos(newLat);
+	float oldX;
+	float oldY;
+	float oldZ;
+	alGetSource3f(sources[source], AL_POSITION, &oldX, &oldY, &oldZ);
+	al_check_error();
+	float oldTheta = cartesian_to_spherical_theta(oldX, oldY, oldZ);
+	float oldPhi = cartesian_to_spherical_phi(oldX, oldY, oldZ);
+	printf("x:%f, y:%f, z:%f, theta:%f, phi:%f\n", oldX, oldY, oldZ, oldTheta, oldPhi);
+	float newTheta = oldTheta + deltaTheta;
+	float newPhi = oldPhi + deltaPhi;
+	float newX = 0.f;
+	float newY = 0.f;
+	float newZ = 0.f;
+	spherical_to_cartesian(3.f, newTheta, newPhi, &newX, &newY, &newZ);
+	printf("x:%f, y:%f, z:%f, theta:%f, phi:%f\n", newX, newY, newZ, newTheta, newPhi);
+	alSource3f(sources[source], AL_POSITION, newX, newY, newZ);
+	al_check_error();
 	// if new position is outside bounds, set new position to bounds
 	// TODO: figure out how to keep latitude and longitude within bounds
 	// of field-of-view.
 }
 
-float openal_module::calc_longitude(float x, float y, float z)
-{
-	// TODO
-	return float();
+void openal_module::source_set_pos(int source, float x, float y, float z) {
+	alSource3f(sources[source], AL_POSITION, x, y, z);
+	al_check_error();
 }
-float openal_module::calc_latitude(float x, float y, float z)
-{
-	// TODO
-	return float();
+
+
+float openal_module::cartesian_to_spherical_rho(float x, float y, float z) {
+	if (x != 0.f || y != 0.f || z != 0.f) {
+		return (sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2)));
+	}
+	return 0.f;
 }
-float openal_module::deg_to_rad(float x) {
-	return x * M_PI / 180;
+
+float openal_module::cartesian_to_spherical_theta(float x, float y, float z) {
+	float theta;
+	if (x != 0.f || y != 0.f || z != 0.f) {
+		if (x != 0.f) {
+			theta = atan(y / x);
+		} else {
+			theta = acos(x / sqrt(pow(x, 2) + pow(y, 2)));
+		}
+		return (theta);
+	}
+	return 0.f;
 }
-float openal_module::rad_to_deg(float x) {
-	return x * 180 / M_PI;
+
+float openal_module::cartesian_to_spherical_phi(float x, float y, float z) {
+	float phi;
+	if (x != 0.f || y != 0.f || z != 0.f) {
+		if (z != 0.f) {
+			phi = atan(sqrt(pow(x, 2.f) + pow(y, 2.f)) / z);
+		} else {
+			phi = acos(z / sqrt(pow(x, 2.f) + pow(y, 2.f) + pow(z, 2.f)));
+		}
+		return (phi);
+	}
+	return 0.f;
+}
+
+void openal_module::cartesian_to_spherical(float x, float y, float z, float *rho, float *theta, float *phi) {
+	*rho = fabs(fmod((cartesian_to_spherical_rho(x, y, z)), M_PI * 2.f));
+	*theta = fabs(fmod((cartesian_to_spherical_theta(x, y, z)), M_PI * 2.f));
+	*phi = fabs(fmod((cartesian_to_spherical_phi(x, y, z)), M_PI * 2.f));
+}
+
+void openal_module::spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z) {
+	*x = rho * sin(phi) * cos(theta);
+	*y = rho * sin(phi) * sin(theta);
+	*z = rho * cos(phi);
+}
+
+float openal_module::remove_negative_zero(float num) {
+	if (num == -0.f)
+		num = 0.f;
+	return num;
+}
+
+float openal_module::deg_to_rad(float degrees) {
+	return degrees * M_PI / 180.f;
+}
+float openal_module::rad_to_deg(float radians) {
+	return radians * 180.f / M_PI;
 }
