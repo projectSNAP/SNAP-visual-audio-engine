@@ -232,6 +232,13 @@ void openal_module::source_set_pos(int source, float x, float y, float z) {
 	al_check_error();
 }
 
+float openal_module::source_get_theta(int source) {
+	float x;
+	float y;
+	float z;
+	alGetSource3f(sources[source], AL_POSITION, &x, &y, &z);
+	return cartesian_to_spherical_theta(x, y, z);
+}
 
 float openal_module::cartesian_to_spherical_rho(float x, float y, float z) {
 	x = zero_threshold(x);
@@ -302,6 +309,7 @@ float openal_module::normalize_angle(float angle) {
 float openal_module::deg_to_rad(float degrees) {
 	return degrees * M_PI / 180.f;
 }
+
 float openal_module::rad_to_deg(float radians) {
 	return radians * 180.f / M_PI;
 }

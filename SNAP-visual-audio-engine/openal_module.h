@@ -16,20 +16,19 @@ public:
 	void source_stop(int source);
 	void source_pause(int source);
 	void source_move(int source, float latitude, float longitude);
-	void source_set_pos(int source, float x, float y, float z);
 	void source_add_pitch(int source, float addPitch);
 	void source_set_pitch(int source, float addPitch);
-
-	float cartesian_to_spherical_rho(float x, float y, float z);
-	float cartesian_to_spherical_theta(float x, float y, float z);
-	float cartesian_to_spherical_phi(float x, float y, float z);
-	void cartesian_to_spherical(float x, float y, float z, float *rho, float *theta, float *phi);
-	void spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z);
-	float deg_to_rad(float x);
-	float rad_to_deg(float x);
-	float zero_threshold(float num);
-	float normalize_angle(float angle);
-
+	void source_set_pos(int source, float x, float y, float z);
+	float source_get_theta(int source);
+	static float deg_to_rad(float x);
+	static float rad_to_deg(float x);
+	static float zero_threshold(float num);
+	static float normalize_angle(float angle);
+	static float cartesian_to_spherical_rho(float x, float y, float z);
+	static float cartesian_to_spherical_theta(float x, float y, float z);
+	static float cartesian_to_spherical_phi(float x, float y, float z);
+	static void cartesian_to_spherical(float x, float y, float z, float *rho, float *theta, float *phi);
+	static void spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z);
 protected:
 	int sourceCount;
 	int bufferCount;
@@ -45,6 +44,5 @@ protected:
 	int *sourceMatCoords;
 	float calc_longitude(float x, float y, float z);
 	float calc_latitude(float x, float y, float z);
-
-
 };
+

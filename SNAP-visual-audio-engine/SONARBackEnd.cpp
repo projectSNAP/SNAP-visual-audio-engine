@@ -339,6 +339,8 @@ int main()
 			horizpos = 0;
 		}
 
+
+		/* Get new frame */
 		if (horizpos == 0) {
 			memcpy(dst, ReadDepthMapBufFile(PointerToBuf), xSize * ySize * 4);
 			split(image, planes);
@@ -366,6 +368,7 @@ int main()
 		//OpenAL Stuff-----------------------------------
 		tick2 = getTickCount();
 		
+		/* Apply movement to each source*/
 		for (int i = 0; i < verticalsources; ++i) {
 			//defines region of interest for this source
 			cv::Rect roi((xSize/horizontal_steps)*horizpos, (ySize/ verticalsources)*i, (xSize/horizontal_steps), (ySize/ verticalsources));
