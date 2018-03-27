@@ -19,20 +19,9 @@ int main() {
 	float x, y, z, rho, theta, phi;
 	x = y = z = rho = theta = phi = 0.f;
 	al.source_play(0);
-	for(int i = 0; i < 360; i++){
-		
+	cout << al.rad_to_deg(atan(7.071068 / -7.071068)) << endl;
+	while (1) {
+		al.source_move(0, al.deg_to_rad(5), 0.f);
+		Sleep(500);
 	}
-		al.source_set_pos(0, 0, 1, 0);
-		Sleep(500);
-		al.source_set_pos(0, 0, 1.5, 0);
-		Sleep(500);
-		al.source_set_pos(0, 0, 2, 0);
-		Sleep(500);
-		al.source_set_pos(0, 0, 2.5, 0);
-		Sleep(500);
-		al.source_set_pos(0, 0, 3, 0);
-		Sleep(500);
-		al.source_set_pos(0, 0, 3.5, 0);
-		Sleep(500);
-	
 }

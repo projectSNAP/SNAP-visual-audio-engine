@@ -27,7 +27,8 @@ public:
 	void spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z);
 	float deg_to_rad(float x);
 	float rad_to_deg(float x);
-	float remove_negative_zero(float num);
+	float zero_threshold(float num);
+	float normalize_angle(float angle);
 
 protected:
 	int sourceCount;

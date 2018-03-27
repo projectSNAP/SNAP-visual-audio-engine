@@ -4,6 +4,10 @@
 #include "openal_module.h"
 #include <limits.h> // SHRT_MAX
 
+#include <iostream>
+
+using namespace std;
+
 /**
  * @brief      OpenAL specific error handling defines
  */
@@ -62,11 +66,11 @@ openal_module::openal_module(int width, int height, float FOV)
 	al_check_error();
 	alcMakeContextCurrent(context);
 	al_check_error();
-	// Set default listener orientation
-	// x+ = right, y+ = up, z+ = forward
+	// Set default listener orientation is specifiec by an "at" vector and an "up" vector
+	// x+ = right, y+ = forward, z+ = up
 	// see https://www.openal.org/documentation/OpenAL_Programmers_Guide.pdf
-	// for info on listener orientation
-	ALfloat listenerOri[] = { 0.f, 0.f, 1.f, 0.f, 1.f, 0.f };
+	// for info on listener orientation section 4.2.1.
+	ALfloat listenerOri[] = { 0.f, 1.f, 0.f, 0.f, 0.f, 1.f };
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, listenerOri);
@@ -118,13 +122,17 @@ void openal_module::init_sources(int count)
 		// Calculate where the sournce would fall on the image matrix
 		sourceMatCoords[i] = (frameHeight / (sourceCount * 2)) + (frameHeight / sourceCount) * i;
 		// Set the proper flags
-		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 1.f);
+		alDistanceModel(AL_INVERSE_DISTANCE);
+		al_check_error();
+		alSourcef(sources[i], AL_ROLLOFF_FACTOR, 1.f);
+		al_check_error();
+		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.5f);
 		al_check_error();
 		alSourcei(sources[i], AL_SOURCE_RELATIVE, AL_TRUE);
 		al_check_error();
 		alSourcei(sources[i], AL_LOOPING, AL_TRUE);
 		al_check_error();
-		alSource3f(sources[i], AL_POSITION, 1, 0, 1);
+		alSource3f(sources[i], AL_POSITION, 10, 0, 0);
 		al_check_error();
 	}
 }
@@ -204,14 +212,14 @@ void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
 	al_check_error();
 	float oldTheta = cartesian_to_spherical_theta(oldX, oldY, oldZ);
 	float oldPhi = cartesian_to_spherical_phi(oldX, oldY, oldZ);
-	printf("x:%f, y:%f, z:%f, theta:%f, phi:%f\n", oldX, oldY, oldZ, oldTheta, oldPhi);
-	float newTheta = oldTheta + deltaTheta;
-	float newPhi = oldPhi + deltaPhi;
+	printf("BEFORE MOVE, x:%f, y:%f, z:%f, theta:%f, phi:%f\n", oldX, oldY, oldZ, rad_to_deg(oldTheta), rad_to_deg(oldPhi));
+	float newTheta = normalize_angle(oldTheta + deltaTheta);
+	float newPhi = normalize_angle(oldPhi + deltaPhi);
 	float newX = 0.f;
 	float newY = 0.f;
 	float newZ = 0.f;
-	spherical_to_cartesian(3.f, newTheta, newPhi, &newX, &newY, &newZ);
-	printf("x:%f, y:%f, z:%f, theta:%f, phi:%f\n", newX, newY, newZ, newTheta, newPhi);
+	spherical_to_cartesian(10.f, newTheta, newPhi, &newX, &newY, &newZ);
+	printf("AFTER MOVE, x:%f, y:%f, z:%f, theta:%f, phi:%f\n", newX, newY, newZ, rad_to_deg(newTheta), rad_to_deg(newPhi));
 	alSource3f(sources[source], AL_POSITION, newX, newY, newZ);
 	al_check_error();
 	// if new position is outside bounds, set new position to bounds
@@ -226,26 +234,30 @@ void openal_module::source_set_pos(int source, float x, float y, float z) {
 
 
 float openal_module::cartesian_to_spherical_rho(float x, float y, float z) {
+	x = zero_threshold(x);
+	y = zero_threshold(y);
+	z = zero_threshold(z);
 	if (x != 0.f || y != 0.f || z != 0.f) {
-		return (sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2)));
+		return zero_threshold(sqrt(pow(x, 2.f) + pow(y, 2.f) + pow(z, 2.f)));
 	}
 	return 0.f;
 }
 
 float openal_module::cartesian_to_spherical_theta(float x, float y, float z) {
-	float theta;
-	if (x != 0.f || y != 0.f || z != 0.f) {
-		if (x != 0.f) {
-			theta = atan(y / x);
-		} else {
-			theta = acos(x / sqrt(pow(x, 2) + pow(y, 2)));
-		}
-		return (theta);
+	x = zero_threshold(x);
+	y = zero_threshold(y);
+	z = zero_threshold(z);
+	if (x != 0.f || y != 0.f) {
+		return normalize_angle(atan2(y, x));
 	}
+	cout << "3\n";
 	return 0.f;
 }
 
 float openal_module::cartesian_to_spherical_phi(float x, float y, float z) {
+	x = zero_threshold(x);
+	y = zero_threshold(y);
+	z = zero_threshold(z);
 	float phi;
 	if (x != 0.f || y != 0.f || z != 0.f) {
 		if (z != 0.f) {
@@ -253,27 +265,38 @@ float openal_module::cartesian_to_spherical_phi(float x, float y, float z) {
 		} else {
 			phi = acos(z / sqrt(pow(x, 2.f) + pow(y, 2.f) + pow(z, 2.f)));
 		}
-		return (phi);
+		return normalize_angle(phi);
 	}
 	return 0.f;
 }
 
 void openal_module::cartesian_to_spherical(float x, float y, float z, float *rho, float *theta, float *phi) {
-	*rho = fabs(fmod((cartesian_to_spherical_rho(x, y, z)), M_PI * 2.f));
-	*theta = fabs(fmod((cartesian_to_spherical_theta(x, y, z)), M_PI * 2.f));
-	*phi = fabs(fmod((cartesian_to_spherical_phi(x, y, z)), M_PI * 2.f));
+	*rho = cartesian_to_spherical_rho(x, y, z);
+	*theta = cartesian_to_spherical_theta(x, y, z);
+	*phi = cartesian_to_spherical_phi(x, y, z);
 }
 
 void openal_module::spherical_to_cartesian(float rho, float theta, float phi, float *x, float *y, float *z) {
-	*x = rho * sin(phi) * cos(theta);
-	*y = rho * sin(phi) * sin(theta);
-	*z = rho * cos(phi);
+	rho = zero_threshold(rho);
+	theta = normalize_angle(theta);
+	phi = normalize_angle(phi);
+	*x = zero_threshold(rho * sin(phi) * cos(theta));
+	*y = zero_threshold(rho * sin(phi) * sin(theta));
+	*z = zero_threshold(rho * cos(phi));
 }
 
-float openal_module::remove_negative_zero(float num) {
-	if (num == -0.f)
+float openal_module::zero_threshold(float num) {
+	if (fabs(num) < 0.000010)
 		num = 0.f;
 	return num;
+}
+
+float openal_module::normalize_angle(float angle) {
+	float fullCircle = 2 * M_PI;
+	fmod(angle, fullCircle);
+	if (angle < 0.f)
+		angle = fullCircle + angle;
+	return zero_threshold(angle);
 }
 
 float openal_module::deg_to_rad(float degrees) {
