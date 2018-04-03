@@ -18,7 +18,7 @@ using namespace std;
 #    pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
-
+// TODO: Stop using globals
 int debug = 1;
 int xSize = 640;
 int ySize = 480;
@@ -55,7 +55,7 @@ const char* al_err_str(ALenum err) {
 #define al_check_error() \
     __al_check_error(__FILE__, __LINE__)
 
-
+// Initialize openAL device and context
 void init_al() {
 	ALCdevice *dev = NULL;
 	ALCcontext *ctx = NULL;
@@ -69,6 +69,7 @@ void init_al() {
 	alcMakeContextCurrent(ctx);
 }
 
+// Exit openAL and clean up
 void exit_al() {
 	ALCdevice *dev = NULL;
 	ALCcontext *ctx = NULL;
@@ -113,6 +114,7 @@ void CreateXY(Mat* Xmat, Mat* Ymat) {
 	}
 }
 
+// Get the dimensions of the shared memory space
 void initDim() {
 	int x; int y;
 	ifstream readFile;
@@ -156,6 +158,7 @@ void initDim() {
 
 }
 
+// Read the user params file.
 void readUserParamFile() {
 
 	ifstream readFile;
@@ -209,13 +212,14 @@ int main()
 	initDim();
 	readUserParamFile();
 
+	// Open the shared memory space for reading.
 	void* PointerToBuf = OpenDepthBufMapFileToRead(xSize,ySize);
 	if(debug)
 		printf("%X \n", ReadDepthMapBufFile(PointerToBuf));
 	
+	// TODO: Xmat and Ymat are unused figure out if they are neccessary
 	Mat Xmat = Mat(ySize, xSize, CV_32FC1);
 	Mat Ymat = Mat(ySize, xSize, CV_32FC1);
-
 	CreateXY(&Xmat, &Ymat);
 
 	int* dst = new int[xSize * ySize];
@@ -230,17 +234,9 @@ int main()
 		return -1;
 	}
 
-	//OpenAL stuff----------------------------------
-	unsigned short pointdist;
-	float pointdistnorm;
-	float StartAngle = (180 - AudioSpreadDeg)/360;
-	float AngleMult = AudioSpreadDeg / 180;
-	float zdist;
-	float xdist;
-	float angle;
-
 	init_al();
 
+	// Create array of buffers
 	ALuint buf[verticalsources];
 	alGenBuffers(verticalsources, buf);
 	al_check_error();
@@ -255,7 +251,7 @@ int main()
 	short *samples;
 	samples = new short[buf_size];
 
-	//Set up the frequencied buffers
+	//Set up the frequencied buffers with sine waves of increasing pitch for the virtical axis
 	for (int q = 0; q < verticalsources; q++){
 		for (int i = 0; i<buf_size; ++i) {
 			samples[i] = 16380 * sin((2.f*float(PI)*freq) / sample_rate * i) * amplitude;
@@ -287,6 +283,7 @@ int main()
 	int64 tick2 = 0;
 	float secondselapsed2  = 0;
 
+	// Set the vertical positions of all the sources.
 	for (int i = 0; i < verticalsources; ++i) {
 		//Vertical position
 		x = i;
@@ -296,6 +293,7 @@ int main()
 
 		sourceMatCoords[i] = xPix;
 
+		// Add buffers to each source and set properties
 		alSourcei(srclist[i], AL_BUFFER, buf[i]);
 		alSourcef(srclist[i], AL_REFERENCE_DISTANCE, 1.0f);
 		alSourcei(srclist[i], AL_SOURCE_RELATIVE, AL_TRUE);
@@ -310,7 +308,14 @@ int main()
 
 	//namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
 	//imshow("Display window", planes[0]);                   // Show our image inside it.
-
+	//OpenAL stuff----------------------------------
+	unsigned short pointdist;
+	float pointdistnorm;
+	float StartAngle = (180 - AudioSpreadDeg)/360;
+	float AngleMult = AudioSpreadDeg / 180;
+	float zdist;
+	float xdist;
+	float angle;
 	int64 delay = 0;
 	int64 delayTick = 0;
 	int horizpos = 0;
@@ -334,6 +339,8 @@ int main()
 			horizpos = 0;
 		}
 
+
+		/* Get new frame */
 		if (horizpos == 0) {
 			memcpy(dst, ReadDepthMapBufFile(PointerToBuf), xSize * ySize * 4);
 			split(image, planes);
@@ -361,6 +368,7 @@ int main()
 		//OpenAL Stuff-----------------------------------
 		tick2 = getTickCount();
 		
+		/* Apply movement to each source*/
 		for (int i = 0; i < verticalsources; ++i) {
 			//defines region of interest for this source
 			cv::Rect roi((xSize/horizontal_steps)*horizpos, (ySize/ verticalsources)*i, (xSize/horizontal_steps), (ySize/ verticalsources));
@@ -389,7 +397,7 @@ int main()
 		//End openAL stuff-------------------------------------------
 
 		horizpos++;
-
+		// Wait for the tick delay
 		delay = ((getTickCount() - delayTick) * 1000) / getTickFrequency();
 		while (delay < stepDelay) { delay = ((getTickCount() - delayTick) * 1000) / getTickFrequency(); }
 	}

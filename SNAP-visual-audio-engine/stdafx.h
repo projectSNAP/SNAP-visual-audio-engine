@@ -8,12 +8,6 @@
 #include "targetver.h"
 
 // TODO: reference additional headers your program requires here
-
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-#include <conio.h>
-#include <stdio.h>
-#include <tchar.h>
 #include "al.h"
 #include "alc.h"
 #include "BlenderToDepthMapDLL.h"
@@ -22,4 +16,14 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <fstream>
-#include <direct.h>
+
+#if defined(_WIN32)
+	#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+	#include <windows.h>
+	#include <conio.h>
+	#include <stdio.h>
+	#include <tchar.h>
+	#include <direct.h>
+#else
+	//TODO: define linux equivalents of above
+#endif
