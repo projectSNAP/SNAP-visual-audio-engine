@@ -8,14 +8,7 @@
 #include "targetver.h"
 
 // TODO: reference additional headers your program requires here
-#include "al.h"
-#include "alc.h"
-#include "BlenderToDepthMapDLL.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
-#include <fstream>
 
 #if defined(_WIN32)
 	#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers

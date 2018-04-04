@@ -18,12 +18,14 @@ public:
 	void source_move(int source, float latitude, float longitude);
 	void source_add_pitch(int source, float addPitch);
 	void source_set_pitch(int source, float addPitch);
-	void source_set_pos(int source, float x, float y, float z);
+	void source_set_pos(int source, float rho, float theta, float phi);
 	float source_get_theta(int source);
+	void source_print_position(int source);
 	static float deg_to_rad(float x);
 	static float rad_to_deg(float x);
 	static float zero_threshold(float num);
 	static float normalize_angle(float angle);
+	static float normalize_rho(float rho);
 	static float cartesian_to_spherical_rho(float x, float y, float z);
 	static float cartesian_to_spherical_theta(float x, float y, float z);
 	static float cartesian_to_spherical_phi(float x, float y, float z);

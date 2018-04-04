@@ -344,8 +344,8 @@ int main()
 		if (horizpos == 0) {
 			memcpy(dst, ReadDepthMapBufFile(PointerToBuf), xSize * ySize * 4);
 			split(image, planes);
-			Mat flipped;
-			flip(planes[0], flipped, 0);
+			// Mat flipped;
+			// flip(planes[0], flipped, 0);
 			//if (!cPressed)
 			//{
 			//	imshow("Display window", flipped);

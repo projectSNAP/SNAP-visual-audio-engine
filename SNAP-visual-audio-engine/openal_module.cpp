@@ -227,7 +227,9 @@ void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
 	// of field-of-view.
 }
 
-void openal_module::source_set_pos(int source, float x, float y, float z) {
+void openal_module::source_set_pos(int source, float rho, float theta, float phi) {
+	float x, y , z;
+	spherical_to_cartesian(rho, theta, phi, &x, &y, &z);
 	alSource3f(sources[source], AL_POSITION, x, y, z);
 	al_check_error();
 }
@@ -238,6 +240,14 @@ float openal_module::source_get_theta(int source) {
 	float z;
 	alGetSource3f(sources[source], AL_POSITION, &x, &y, &z);
 	return cartesian_to_spherical_theta(x, y, z);
+}
+
+void openal_module::source_print_position(int source)
+{
+	float x, y, z, rho, theta, phi;
+	alGetSource3f(sources[source], AL_POSITION, &x, &y, &z);
+	cartesian_to_spherical(x, y, z, &rho, &theta, &phi);
+	printf("SOURCE[%d] POSITION: x:%f, y:%f, z:%f, rho:%f, theta:%f, phi:%f\n", source, x, y, z, rad_to_deg(rho), rad_to_deg(theta), rad_to_deg(phi));
 }
 
 float openal_module::cartesian_to_spherical_rho(float x, float y, float z) {
@@ -257,7 +267,6 @@ float openal_module::cartesian_to_spherical_theta(float x, float y, float z) {
 	if (x != 0.f || y != 0.f) {
 		return normalize_angle(atan2(y, x));
 	}
-	cout << "3\n";
 	return 0.f;
 }
 

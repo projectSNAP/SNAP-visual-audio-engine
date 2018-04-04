@@ -24,9 +24,6 @@
     <ClCompile Include="input_module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="audio_config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared_mem_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,6 +31,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="openal_module.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="config_module.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="file_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="visual_audio_algorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,13 +56,19 @@
     <ClInclude Include="input_module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="audio_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared_mem_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="openal_module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config_module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="file_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="visual_audio_algorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
