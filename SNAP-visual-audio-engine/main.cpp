@@ -11,9 +11,8 @@
 using namespace std;
 
 int main() {
-	file_input input = file_input();
-	input.get_frame();
+	file_input *input = new file_input();
 	visual_audio_algorithm algorithm(input);
-	config_module config = config_module();
+	config_module *config = new config_module();
 	algorithm.start(config);
 }

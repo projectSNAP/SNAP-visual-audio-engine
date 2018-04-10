@@ -26,6 +26,8 @@ cv::Mat file_input::get_frame() {
 		// 	imshow( "Display window", splitImage[i]);
 		// 	waitKey(2000);
 		// }
-		return splitImage[0];
+		Mat inverted;
+		bitwise_not(splitImage[0], inverted);
+		return inverted;
 	}
 }
