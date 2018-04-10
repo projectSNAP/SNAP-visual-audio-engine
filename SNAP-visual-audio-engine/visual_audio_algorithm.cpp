@@ -20,8 +20,7 @@ int visual_audio_algorithm::start(config_module *config) {
 	}
 	// openCV
 	opencv_module cv(width, height);
-	cv::Mat frame = input->get_frame();
-	cv.set_current_frame(&frame);
+	cv.set_current_frame(input->get_frame());
 	int x = 0;
 	float intensity = 0.f;
 	while (1) {
@@ -35,7 +34,7 @@ int visual_audio_algorithm::start(config_module *config) {
 			al.source_print_position(0);
 			Sleep(1);
 		}
-		frame = input->get_frame();
+		cv.set_current_frame(input->get_frame());
 		for (x; x >= 0; x--) {
 			for (int y = 0; y < height; y++) {
 				al.source_set_pos(x, y);
@@ -46,7 +45,7 @@ int visual_audio_algorithm::start(config_module *config) {
 			al.source_print_position(0);
 			Sleep(1);
 		}
-		frame = input->get_frame();
+		cv.set_current_frame(input->get_frame());
 	}
 	return 0;
 }

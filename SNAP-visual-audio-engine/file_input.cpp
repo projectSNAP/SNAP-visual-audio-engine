@@ -18,16 +18,8 @@ cv::Mat file_input::get_frame() {
 		return Mat();
 	}
 	else {
-		int channels = image.channels();
-		splitImage = new Mat[channels];
-		split(image, splitImage);
-		// namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
-		// for (int i = 0; i < channels; i++) {
-		// 	imshow( "Display window", splitImage[i]);
-		// 	waitKey(2000);
-		// }
 		Mat inverted;
-		bitwise_not(splitImage[0], inverted);
+		bitwise_not(image, inverted);
 		return inverted;
 	}
 }
