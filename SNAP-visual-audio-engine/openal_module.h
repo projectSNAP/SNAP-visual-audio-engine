@@ -7,7 +7,7 @@ class openal_module
 public:
 	openal_module(int width, int height, float FOV);
 	~openal_module();
-	void init_sine_buffers(int count, int sampleRate, float amplitude, int frequency);
+	void init_sine_buffers(int count, float sampleRate, float amplitude, float frequencyMin, float frequencyMax);
 	void init_sources(int count);
 	const unsigned int *get_sources();
 	const unsigned int *get_buffers();

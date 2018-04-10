@@ -90,15 +90,22 @@ openal_module::~openal_module()
 
 // TODO: add the ability to create buffers of varying waveforms
 
-void openal_module::init_sine_buffers(int count, int sampleRate, float amplitude, int frequency) {
+void openal_module::init_sine_buffers(int count, float sampleRate, float amplitude, float frequencyMin, float frequencyMax) {
+	// Calculate frequency increment
+	float freqInc = (frequencyMax - frequencyMin) / count;
+	if (buffers != NULL) {
+		free(buffers);
+	}
 	buffers = new ALuint[count];
 	alGenBuffers(count, buffers);
 	short *samples = new short[sampleRate];
+	float currFreq = frequencyMin;
 	for (int buffer = 0; buffer < count; buffer++) {
 		for (int i = 0; i < sampleRate; ++i) {
-			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * frequency / sampleRate));
+			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * currFreq / sampleRate));
 		}
 		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleRate * sizeof(short), sampleRate);
+		currFreq += freqInc;
 		al_check_error();
 	}
 }
@@ -237,7 +244,7 @@ void openal_module::source_set_pos(int x, int y) {
 	float startAngle = (((2.f * M_PI) - horizontalFOV) / 2.f);
 	// The angle increment is the size (in radians) of each x increment.
 	float angleIncrement = horizontalFOV / xMax;
-	float theta = startAngle + (angleIncrement/2.f) + (angleIncrement * x);
+	float theta = startAngle + (angleIncrement / 2.f) + (angleIncrement * x);
 	float phi = deg_to_rad(90);
 	float rho = 10.f;
 	// Get the new coordinates in cartesian

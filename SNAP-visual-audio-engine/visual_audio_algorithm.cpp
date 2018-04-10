@@ -8,7 +8,7 @@ int visual_audio_algorithm::start(const config_module &config) {
 	float FOV = 180;
 	openal_module al(width, height, FOV);
 	al.init_sources(height);
-	al.init_sine_buffers(height, 44100, 0.2, 220);
+	al.init_sine_buffers(height, 44100, 0.2, 110.f, 440.f);
 	// add buffers to sources
 	for (int i = 0; i < height; i++) {
 		al.source_set_buffer(i, i);
