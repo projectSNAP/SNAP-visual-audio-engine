@@ -12,10 +12,17 @@ int visual_audio_algorithm::start(const config_module &config) {
 	// add buffers to sources
 	for (int i = 0; i < height; i++) {
 		al.source_set_buffer(i, i);
+		al.source_set_gain(i, 0.f);
+		al.source_play(i);
 	}
-	al.source_play(0);
 	int x = 0;
 	while (1) {
+		for (int i = 0; i < 100; i++) {
+			float volume = (float)i / 100.f;
+			cout << volume << endl;
+			al.source_set_gain(0, volume);
+			Sleep(10);
+		}
 		for (x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				al.source_set_pos(x,y);

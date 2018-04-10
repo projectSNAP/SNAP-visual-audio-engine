@@ -19,6 +19,9 @@ public:
 	void source_set_pos(int x, int y);
 	void source_add_pitch(int source, float addPitch);
 	void source_set_pitch(int source, float addPitch);
+	void source_set_gain(int source, float gain);
+	float source_get_gain(int source);
+	void source_add_gain(int source, float addGain);
 	float source_get_theta(int source);
 	void source_print_position(int source);
 	static float deg_to_rad(float x);

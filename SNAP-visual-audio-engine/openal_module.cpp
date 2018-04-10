@@ -196,6 +196,23 @@ void openal_module::source_set_pitch(int source, float pitch) {
 	al_check_error();
 }
 
+void openal_module::source_set_gain(int source, float gain) {
+	alSourcef(sources[source], AL_GAIN, gain);
+	al_check_error();
+}
+
+float openal_module::source_get_gain(int source) {
+	float gain = 0.0;
+	alGetSourcef(sources[source], AL_GAIN, &gain);
+	al_check_error();
+	return gain;
+}
+
+void openal_module::source_add_gain(int source, float addGain) {
+	ALfloat gain = source_get_gain(source);
+	gain += addGain;
+	source_set_gain(source, gain);
+}
 /**
  * @brief      Moves a source around within the bounds of the FOV.
  *
