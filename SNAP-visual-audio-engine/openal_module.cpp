@@ -40,23 +40,20 @@ const char* al_err_str(ALenum err) {
  * @param[in]  count   The number of sources.
  * @param[in]  width   The width of the frame.
  * @param[in]  height  The height of the frame.
- * @param[in]  FOV     The field-of-view of the frame.
+ * @param[in]  FOV     The field-of-view of the frame in degrees.
  */
 openal_module::openal_module(int width, int height, float FOV)
 {
+	// TODO: set limit on height to 16 and throw error otherwise.
 	// Set Globals
-	sourceCount = 0;
-	bufferCount = 0;
-	frameWidth = width;
-	frameHeight = height;
-	horizontalFOV = FOV;
-	verticalFOV = 2 * atan(tan(horizontalFOV / 2) * (frameHeight / frameWidth));
+	horizontalFOV = normalize_angle(deg_to_rad(FOV));
+	xMax = width;
+	yMax = height;
 	// Initialize pointers
 	device = NULL;
 	context = NULL;
 	sources = NULL;
 	buffers = NULL;
-	sourceMatCoords = NULL;
 	// Create OpenAL device
 	const char *defname = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
 	device = alcOpenDevice(defname);
@@ -67,10 +64,10 @@ openal_module::openal_module(int width, int height, float FOV)
 	alcMakeContextCurrent(context);
 	al_check_error();
 	// Set default listener orientation is specifiec by an "at" vector and an "up" vector
-	// x+ = right, y+ = forward, z+ = up
+	// y+ = right, x- = forward, z+ = up
 	// see https://www.openal.org/documentation/OpenAL_Programmers_Guide.pdf
 	// for info on listener orientation section 4.2.1.
-	ALfloat listenerOri[] = { 0.f, 1.f, 0.f, 0.f, 0.f, 1.f };
+	ALfloat listenerOri[] = { -1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, listenerOri);
@@ -94,11 +91,10 @@ openal_module::~openal_module()
 // TODO: add the ability to create buffers of varying waveforms
 
 void openal_module::init_sine_buffers(int count, int sampleRate, float amplitude, int frequency) {
-	bufferCount = count;
-	buffers = new ALuint[bufferCount];
-	alGenBuffers(bufferCount, buffers);
+	buffers = new ALuint[count];
+	alGenBuffers(count, buffers);
 	short *samples = new short[sampleRate];
-	for (int buffer = 0; buffer < bufferCount; buffer++) {
+	for (int buffer = 0; buffer < count; buffer++) {
 		for (int i = 0; i < sampleRate; ++i) {
 			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * frequency / sampleRate));
 		}
@@ -112,28 +108,26 @@ void openal_module::init_sine_buffers(int count, int sampleRate, float amplitude
  */
 void openal_module::init_sources(int count)
 {
-	sourceCount = count;
-	sources = new ALuint[sourceCount];
-	alGenSources(sourceCount, sources);
-	sourceMatCoords = new int[sourceCount];
+	sources = new ALuint[count];
+	alGenSources(count, sources);
 	al_check_error();
 	// Set the vertical positions of all the sources.
-	for (int i = 0; i < sourceCount; ++i) {
-		// Calculate where the sournce would fall on the image matrix
-		sourceMatCoords[i] = (frameHeight / (sourceCount * 2)) + (frameHeight / sourceCount) * i;
+	for (int i = 0; i < count; ++i) {
 		// Set the proper flags
 		alDistanceModel(AL_INVERSE_DISTANCE);
 		al_check_error();
 		alSourcef(sources[i], AL_ROLLOFF_FACTOR, 1.f);
 		al_check_error();
-		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.5f);
+		alSourcef(sources[i], AL_REFERENCE_DISTANCE, 1.f);
 		al_check_error();
-		alSourcei(sources[i], AL_SOURCE_RELATIVE, AL_TRUE);
+		alSourcei(sources[i], AL_SOURCE_RELATIVE, AL_FALSE);
 		al_check_error();
 		alSourcei(sources[i], AL_LOOPING, AL_TRUE);
 		al_check_error();
 		alSource3f(sources[i], AL_POSITION, 10, 0, 0);
 		al_check_error();
+		// Set initial position
+		source_set_pos(0, i);
 	}
 }
 
@@ -227,10 +221,32 @@ void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
 	// of field-of-view.
 }
 
-void openal_module::source_set_pos(int source, float rho, float theta, float phi) {
-	float x, y , z;
-	spherical_to_cartesian(rho, theta, phi, &x, &y, &z);
-	alSource3f(sources[source], AL_POSITION, x, y, z);
+void openal_module::source_set_pos(int x, int y) {
+	// Make sure x and y are within bounds
+	if ( x >= xMax)
+		x = xMax - 1;
+	else if (x < 0)
+		x = 0;
+	if (y >= yMax)
+		y = yMax - 1;
+	else if (y < 0)
+		y = 0;
+	// Find the start angle since theta starts at 0 behind the listener
+	// we have to start at an offset to center the FOV infront of the
+	// listener.
+	float startAngle = (((2.f * M_PI) - horizontalFOV) / 2.f);
+	// The angle increment is the size (in radians) of each x increment.
+	float angleIncrement = horizontalFOV / xMax;
+	float theta = startAngle + (angleIncrement/2.f) + (angleIncrement * x);
+	float phi = deg_to_rad(90);
+	float rho = 10.f;
+	// Get the new coordinates in cartesian
+	float newX = 0.f;
+	float newY = 0.f;
+	float newZ = 0.f;
+	spherical_to_cartesian(rho, theta, phi, &newX, &newY, &newZ);
+	// Set the source position
+	alSource3f(sources[y], AL_POSITION, newX, newY, newZ);
 	al_check_error();
 }
 
