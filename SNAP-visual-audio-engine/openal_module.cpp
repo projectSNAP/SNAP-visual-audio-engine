@@ -90,7 +90,17 @@ openal_module::~openal_module()
 
 // TODO: add the ability to create buffers of varying waveforms
 
-void openal_module::init_sine_buffers(int count, float sampleRate, float amplitude, float frequencyMin, float frequencyMax) {
+/**
+ * @brief      Create an array of buffers that contain a sine wave of increasing frequency.
+ *
+ * @param[in]  count         The number of buffers to create.
+ * @param[in]  length        The length of each buffer in seconds.
+ * @param[in]  sampleRate    The sample rate of each buffer.
+ * @param[in]  amplitude     The amplitude amplitude of each buffer (should be in a range of 0-1).
+ * @param[in]  frequencyMin  The low end of the frequency range.
+ * @param[in]  frequencyMax  The high end of the frequency range.
+ */
+void openal_module::init_sine_buffers(int count, float length, float sampleRate, float amplitude, float frequencyMin, float frequencyMax) {
 	// Calculate frequency increment
 	float freqInc = (frequencyMax - frequencyMin) / count;
 	if (buffers != NULL) {
@@ -98,13 +108,14 @@ void openal_module::init_sine_buffers(int count, float sampleRate, float amplitu
 	}
 	buffers = new ALuint[count];
 	alGenBuffers(count, buffers);
-	short *samples = new short[sampleRate];
+	int sampleSize = sampleRate * length;
+	short *samples = new short[sampleSize];
 	float currFreq = frequencyMin;
 	for (int buffer = 0; buffer < count; buffer++) {
-		for (int i = 0; i < sampleRate; ++i) {
+		for (int i = 0; i < sampleSize; ++i) {
 			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * currFreq / sampleRate));
 		}
-		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleRate * sizeof(short), sampleRate);
+		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleSize * sizeof(short), sampleRate);
 		currFreq += freqInc;
 		al_check_error();
 	}
