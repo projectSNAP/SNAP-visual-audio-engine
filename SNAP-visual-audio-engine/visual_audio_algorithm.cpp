@@ -1,18 +1,13 @@
 #include "visual_audio_algorithm.h"
 #include "openal_module.h"
 #include "opencv_module.h"
-#include <opencv2/core/core.hpp>
-#include <chrono>
 
-// Typedefs used for the delay function.
-typedef std::chrono::high_resolution_clock high_resolution_clock;
-typedef std::chrono::milliseconds milliseconds;
-typedef std::chrono::duration<double> duration;
-typedef std::chrono::time_point<chrono::steady_clock> time_point;
+visual_audio_algorithm::visual_audio_algorithm(input_module *input_module)
+{
+	input = input_module;
+}
 
-void delay(int delayLength, time_point start = high_resolution_clock::now());
-
-int visual_audio_algorithm::start(config_module *config) {
+int visual_audio_algorithm::bilateral(config_module *config) {
 	int width = 36;
 	int height = 16;
 	float FOV = 180;
@@ -28,6 +23,7 @@ int visual_audio_algorithm::start(config_module *config) {
 	}
 	// openCV
 	opencv_module cv(width, height);
+
 	cv.set_current_frame(input->get_frame());
 	int x = 0;
 	float intensity = 0.f;
@@ -66,7 +62,7 @@ int visual_audio_algorithm::start(config_module *config) {
  * @param[in]  delayLength  The delay length the length in milliseconds that you would like to delay for.
  * @param[in]  start        (Optional) The start the time_point where you want to delay from.
  */
-void delay(int delayLength, time_point start) {
+void visual_audio_algorithm::delay(int delayLength, time_point start) {
 	time_point now;
 	duration elapsedTime;
 	do  {
