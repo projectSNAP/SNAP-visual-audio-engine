@@ -1,10 +1,11 @@
 #define _USE_MATH_DEFINES
 #include <cmath> // Trigonometric functions
-#include "stdafx.h"
-#include "openal_module.h"
 #include <limits.h> // SHRT_MAX
-
 #include <iostream>
+
+#include "openal_module.h"
+
+#define SAMPLE_RATE 44100.f
 
 using namespace std;
 
@@ -95,12 +96,11 @@ openal_module::~openal_module()
  *
  * @param[in]  count         The number of buffers to create.
  * @param[in]  length        The length of each buffer in seconds.
- * @param[in]  sampleRate    The sample rate of each buffer.
  * @param[in]  amplitude     The amplitude amplitude of each buffer (should be in a range of 0-1).
  * @param[in]  frequencyMin  The low end of the frequency range.
  * @param[in]  frequencyMax  The high end of the frequency range.
  */
-void openal_module::init_sine_buffers(int count, float length, float sampleRate, float amplitude, float frequencyMin, float frequencyMax) {
+void openal_module::init_sine_buffers(int count, float length, float amplitude, float frequencyMin, float frequencyMax) {
 	// Calculate frequency increment
 	float freqInc = (frequencyMax - frequencyMin) / count;
 	if (buffers != NULL) {
@@ -108,14 +108,14 @@ void openal_module::init_sine_buffers(int count, float length, float sampleRate,
 	}
 	buffers = new ALuint[count];
 	alGenBuffers(count, buffers);
-	int sampleSize = sampleRate * length;
+	int sampleSize = SAMPLE_RATE * length;
 	short *samples = new short[sampleSize];
 	float currFreq = frequencyMin;
 	for (int buffer = 0; buffer < count; buffer++) {
 		for (int i = 0; i < sampleSize; ++i) {
-			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * currFreq / sampleRate));
+			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * currFreq / SAMPLE_RATE));
 		}
-		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleSize * sizeof(short), sampleRate);
+		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleSize * sizeof(short), SAMPLE_RATE);
 		currFreq += freqInc;
 		al_check_error();
 	}

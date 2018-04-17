@@ -2,19 +2,23 @@
 #include "openal_module.h"
 #include "opencv_module.h"
 
+using namespace std::chrono;
+using namespace config;
+// Typedefs used for the delay function, for brevity.
+
 visual_audio_algorithm::visual_audio_algorithm(input_module *input_module)
 {
 	input = input_module;
 }
 
-int visual_audio_algorithm::bilateral(config_module *config) {
+int visual_audio_algorithm::bilateral(config_type config) {
 	int width = 36;
 	int height = 16;
 	float FOV = 180;
 	// openAL
 	openal_module al(width, height, FOV);
 	al.init_sources(height);
-	al.init_sine_buffers(height, 5.f, 44100, 0.2, 110.f, 440.f);
+	al.init_sine_buffers(height, 5.f, 0.2, 110.f, 440.f);
 	// add buffers to sources
 	for (int i = 0; i < height; i++) {
 		al.source_set_buffer(i, i);
@@ -28,7 +32,7 @@ int visual_audio_algorithm::bilateral(config_module *config) {
 	int x = 0;
 	float intensity = 0.f;
 	int delayLength = 10;
-	time_point start;
+	time_point<steady_clock> start;
 	while (1) {
 		for (x = 0; x < width; x++) {
 			start = high_resolution_clock::now();
@@ -62,11 +66,11 @@ int visual_audio_algorithm::bilateral(config_module *config) {
  * @param[in]  delayLength  The delay length the length in milliseconds that you would like to delay for.
  * @param[in]  start        (Optional) The start the time_point where you want to delay from.
  */
-void visual_audio_algorithm::delay(int delayLength, time_point start) {
-	time_point now;
-	duration elapsedTime;
+void visual_audio_algorithm::delay(int delayLength, time_point<steady_clock> start) {
+	time_point<steady_clock> now;
+	duration<double> elapsedTime;
 	do  {
 		now = high_resolution_clock::now();
 		elapsedTime = now - start;
-	} while (chrono::duration_cast<milliseconds>(elapsedTime).count() < delayLength);
+	} while (duration_cast<milliseconds>(elapsedTime).count() < delayLength);
 }
