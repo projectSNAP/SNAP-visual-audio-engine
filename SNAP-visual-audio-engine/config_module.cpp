@@ -1,108 +1,149 @@
 #include "config_module.h"
-#include "json.hpp"
 #include <fstream>
 #include <iostream>
+#include "json.hpp"
 
 using namespace std;
 using namespace nlohmann;
 
+namespace config {
 /**
- * @brief      Helper function to validate that the config is a number.
- * @details    Checks that the key exists in the config then verifies it's type.
+ * @brief      Loads a configuration from a .json file.
  *
- * @param      config  Json object
- * @param      name    The key
- * @param      type    The type
- *
- * @return     True if valid, false if not.
+ * @param      filePath the path to the .json file.
  */
-bool validate(json config, string name) {
-	if (config.find(name) != config.end()) {
-		if ( config[name].type() == json::value_t::number_integer
-		        || config[name].type() == json::value_t::number_unsigned
-		        || config[name].type() == json::value_t::number_float) {
+config_type load(string filePath)
+{
+	json jsonConfig;
+	config_type newConfig;
+	try {
+		ifstream inputFile(filePath);
+		inputFile >> jsonConfig;
+		set_int_config(jsonConfig, "horizontalResolution", newConfig.horizontalResolution);
+		set_int_config(jsonConfig, "verticalResolution", newConfig.verticalResolution);
+		set_int_config(jsonConfig, "cycleLength", newConfig.cycleLength);
+		set_float_config(jsonConfig, "fieldOfView", newConfig.fieldOfView);
+		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
+		set_float_config(jsonConfig, "amplitude", newConfig.amplitude);
+		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
+		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
+		set_scantype_config(jsonConfig, "scanType", newConfig.scanType);
+		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
+		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
+	}
+	catch (json::parse_error &e) {
+		cerr << e.what() << endl;
+		cerr << "Error reading file, defaults will be used." << endl;
+	}
+	return newConfig;
+}
+
+bool iequals(const string a, const string b)
+{
+	for (unsigned int i = 0; a[i] != '\0'; ++i)
+		if (tolower(a[i]) != tolower(b[i]))
+			return false;
+	return true;
+}
+
+int string_in_array(const string str, const string* arr, int arrSize) {
+	for (int i = 0; i < arrSize; i ++) {
+		if (iequals(arr[i], str)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool is_scantype(const string str) {
+	return string_in_array(str, scanTypeStrings, scanTypeStringsCount);
+}
+
+bool is_soundgradient(const string str) {
+	return string_in_array(str, soundGradientStrings, soundGradientCount);
+}
+
+bool is_number(json jsonConfig, const string name) {
+	if (jsonConfig.find(name) != jsonConfig.end()) {
+		if ( jsonConfig[name].type() == json::value_t::number_integer
+		        || jsonConfig[name].type() == json::value_t::number_unsigned
+		        || jsonConfig[name].type() == json::value_t::number_float) {
 			return true;
 		}
 	}
-	cerr << "Config \"" << name << "\" could not be loaded." << endl;
 	return false;
 }
 
-config_module::config_module()
-{
-	sourceResolutionVal = 16;
-	fieldOfViewVal = 90;
-	frequencyVal = 220.0;
-	horizontalStepsVal = 10;
-	freqIncrementVal = 0.0;
-	stepDelayVal = 50;
-	audioSpreadDegVal = 180;
-	audioVolRollOffVal = 0;
-}
-
-/**
- * @brief      Loads the configurations from a .json file.
- * @details    [long description]
- *
- * @param      filePath  [description]
- */
-void config_module::load(string filePath)
-{
-	json config;
-	ifstream inputFile(filePath);
-	if (!inputFile) {
-		cerr << "Input file could not be opened for reading. Config values set to default." << endl;
+bool is_string(json config, const string name) {
+	if (config.find(name) != config.end()) {
+		if ( config[name].type() == json::value_t::string) {
+			return true;
+		}
 	}
-	inputFile >> config;
-
-	if (validate(config, "sourceResolution")) {
-		sourceResolutionVal = config["sourceResolution"];
-	}
-	if (validate(config, "fieldOfView")) {
-		fieldOfViewVal = config["fieldOfView"];
-	}
-	if (validate(config, "frequency")) {
-		frequencyVal = config["frequency"];
-	}
-	if (validate(config, "horizontalSteps")) {
-		horizontalStepsVal = config["horizontalSteps"];
-	}
-	if (validate(config, "freqIncrement")) {
-		freqIncrementVal = config["freqIncrement"];
-	}
-	if (validate(config, "stepDelay")) {
-		stepDelayVal = config["stepDelay"];
-	}
-	if (validate(config, "audioSpreadDeg")) {
-		audioSpreadDegVal = config["audioSpreadDeg"];
-	}
-	if (validate(config, "audioVolRollOff")) {
-		audioVolRollOffVal = config["audioVolRollOff"];
-	}
+	return false;
 }
 
 
-int config_module::sourceResolution(){
-	return sourceResolutionVal;
+void set_int_config(nlohmann::json config, const string name, int &destination) {
+	if (is_number(config, name)) {
+		destination = config[name];
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+	}
+	else {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	}
 }
-int config_module::fieldOfView(){
-	return fieldOfViewVal;
+
+void set_float_config(json config, const string name, float &destination) {
+	if (is_number(config, name)) {
+		destination = config[name];
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+	}
+	else {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	}
 }
-float config_module::frequency(){
-	return frequencyVal;
+
+void set_scantype_config(json config, const string name, ScanType &destination) {
+	if (is_string(config, name)) {
+		string x = config[name];
+		int result = string_in_array(x, scanTypeStrings, scanTypeStringsCount);
+		if (result != -1) {
+			destination = (ScanType)result;
+			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+		}
+		else {
+			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+		}
+	}
 }
-int config_module::horizontalSteps(){
-	return horizontalStepsVal;
+
+void set_soundgradient_config(json config, string name, SoundGradient &destination) {
+	if (is_string(config, name)) {
+		string x = config[name];
+		int result = string_in_array(x, soundGradientStrings, soundGradientCount);
+		if (result != -1) {
+			destination = (SoundGradient)result;
+			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+		}
+		else {
+			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+		}
+	}
 }
-float config_module::freqIncrement(){
-	return freqIncrementVal;
+
+void print(config_type config) {
+	printf("%d \n", config.horizontalResolution);
+	printf("%d \n", config.verticalResolution);
+	printf("%d \n", config.cycleLength);
+	printf("%f \n", config.fieldOfView);
+	printf("%f \n", config.sampleLength);
+	printf("%f \n", config.amplitude);
+	printf("%f \n", config.frequencyMin);
+	printf("%f \n", config.frequencyMax);
+	printf("%d \n", config.scanType);
+	printf("%d \n", config.distanceIndicator);
+	printf("%d \n", config.heightIndicator);
 }
-int config_module::stepDelay(){
-	return stepDelayVal;
-}
-float config_module::audioSpreadDeg(){
-	return audioSpreadDegVal;
-}
-float config_module::audioVolRollOff(){
-	return audioVolRollOffVal;
+
 }
