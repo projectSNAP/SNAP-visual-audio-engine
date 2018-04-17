@@ -60,7 +60,7 @@ typedef struct config_type {
 		amplitude = 1.f;
 		frequencyMin = 110.f;
 		frequencyMax = 440.f;
-		cycleLength = 320;
+		cycleLength = 1000;
 		scanType = BILATERAL;
 		distanceIndicator = VOLUME;
 		heightIndicator = FREQUENCY;

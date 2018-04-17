@@ -96,11 +96,10 @@ openal_module::~openal_module()
  *
  * @param[in]  count         The number of buffers to create.
  * @param[in]  length        The length of each buffer in seconds.
- * @param[in]  amplitude     The amplitude amplitude of each buffer (should be in a range of 0-1).
  * @param[in]  frequencyMin  The low end of the frequency range.
  * @param[in]  frequencyMax  The high end of the frequency range.
  */
-void openal_module::init_sine_buffers(int count, float length, float amplitude, float frequencyMin, float frequencyMax) {
+void openal_module::init_sine_buffers(int count, float length, float frequencyMin, float frequencyMax) {
 	// Calculate frequency increment
 	float freqInc = (frequencyMax - frequencyMin) / count;
 	if (buffers != NULL) {
@@ -113,7 +112,7 @@ void openal_module::init_sine_buffers(int count, float length, float amplitude, 
 	float currFreq = frequencyMin;
 	for (int buffer = 0; buffer < count; buffer++) {
 		for (int i = 0; i < sampleSize; ++i) {
-			samples[i] = ((amplitude * SHRT_MAX) * sin(2 * M_PI * i * currFreq / SAMPLE_RATE));
+			samples[i] = ((SHRT_MAX) * sin(2 * M_PI * i * currFreq / SAMPLE_RATE));
 		}
 		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleSize * sizeof(short), SAMPLE_RATE);
 		currFreq += freqInc;
@@ -241,14 +240,12 @@ void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
 	al_check_error();
 	float oldTheta = cartesian_to_spherical_theta(oldX, oldY, oldZ);
 	float oldPhi = cartesian_to_spherical_phi(oldX, oldY, oldZ);
-	printf("BEFORE MOVE, x:%f, y:%f, z:%f, theta:%f, phi:%f\n", oldX, oldY, oldZ, rad_to_deg(oldTheta), rad_to_deg(oldPhi));
 	float newTheta = normalize_angle(oldTheta + deltaTheta);
 	float newPhi = normalize_angle(oldPhi + deltaPhi);
 	float newX = 0.f;
 	float newY = 0.f;
 	float newZ = 0.f;
 	spherical_to_cartesian(10.f, newTheta, newPhi, &newX, &newY, &newZ);
-	printf("AFTER MOVE, x:%f, y:%f, z:%f, theta:%f, phi:%f\n", newX, newY, newZ, rad_to_deg(newTheta), rad_to_deg(newPhi));
 	alSource3f(sources[source], AL_POSITION, newX, newY, newZ);
 	al_check_error();
 	// if new position is outside bounds, set new position to bounds
@@ -302,6 +299,7 @@ void openal_module::source_print_position(int source)
 }
 
 float openal_module::cartesian_to_spherical_rho(float x, float y, float z) {
+	// TODO: fix or remove rho...this does not calculate the correct rho.
 	x = zero_threshold(x);
 	y = zero_threshold(y);
 	z = zero_threshold(z);

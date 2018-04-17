@@ -4,7 +4,8 @@
 #include "json.hpp"
 
 namespace config {
-
+// TODO: validate each input to make sure it's within a reasonable range
+// such as 0 - 16 for verticalResolution.
 config_type load(std::string filePath);
 bool iequals(const std::string a, const std::string b);
 int string_in_array(const std::string str, const std::string* arr, int arrSize);

@@ -12,31 +12,36 @@ visual_audio_algorithm::visual_audio_algorithm(input_module *input_module)
 }
 
 int visual_audio_algorithm::bilateral(config_type config) {
-	int width = 36;
-	int height = 16;
-	float FOV = 180;
 	// openAL
-	openal_module al(width, height, FOV);
-	al.init_sources(height);
-	al.init_sine_buffers(height, 5.f, 0.2, 110.f, 440.f);
+	openal_module al(
+	    config.horizontalResolution,
+	    config.verticalResolution,
+	    config.fieldOfView
+	);
+	al.init_sources(config.verticalResolution);
+	al.init_sine_buffers(
+	    config.verticalResolution,
+	    config.sampleLength,
+	    config.frequencyMin,
+	    config.frequencyMax
+	);
 	// add buffers to sources
-	for (int i = 0; i < height; i++) {
+	for (int i = 0; i < config.verticalResolution; i++) {
 		al.source_set_buffer(i, i);
 		al.source_set_gain(i, 0.f);
 		al.source_play(i);
 	}
 	// openCV
-	opencv_module cv(width, height);
-
+	opencv_module cv(config.horizontalResolution, config.verticalResolution);
 	cv.set_current_frame(input->get_frame());
-	int x = 0;
 	float intensity = 0.f;
-	int delayLength = 10;
+	int delayLength = config.cycleLength / config.horizontalResolution;
 	time_point<steady_clock> start;
+	int x = 0;
 	while (1) {
-		for (x = 0; x < width; x++) {
+		for (x = 0; x < config.horizontalResolution; x++) {
 			start = high_resolution_clock::now();
-			for (int y = 0; y < height; y++) {
+			for (int y = 0; y < config.verticalResolution; y++) {
 				al.source_set_pos(x, y);
 				intensity = cv.get_intensity(x, y);
 				al.source_set_gain(y, intensity);
@@ -47,7 +52,7 @@ int visual_audio_algorithm::bilateral(config_type config) {
 		cv.set_current_frame(input->get_frame());
 		for (x; x >= 0; x--) {
 			start = high_resolution_clock::now();
-			for (int y = 0; y < height; y++) {
+			for (int y = 0; y < config.verticalResolution; y++) {
 				al.source_set_pos(x, y);
 				intensity = cv.get_intensity(x, y);
 				al.source_set_gain(y, intensity);
