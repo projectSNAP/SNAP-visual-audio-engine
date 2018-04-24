@@ -1,53 +1,81 @@
-#include "stdafx.h"
 #include "visual_audio_algorithm.h"
 #include "openal_module.h"
 #include "opencv_module.h"
-#include <opencv2/core/core.hpp>
 
-int visual_audio_algorithm::start(config_module *config) {
-	int width = 180;
-	int height = 16;
-	float FOV = 180;
+using namespace std::chrono;
+using namespace config;
+// Typedefs used for the delay function, for brevity.
+
+visual_audio_algorithm::visual_audio_algorithm(input_module *input_module)
+{
+	input = input_module;
+}
+
+int visual_audio_algorithm::bilateral(config_type config) {
 	// openAL
-	openal_module al(width, height, FOV);
-	al.init_sources(height);
-	al.init_sine_buffers(height, 44100, 0.2, 110.f, 440.f);
+	openal_module al(
+	    config.horizontalResolution,
+	    config.verticalResolution,
+	    config.fieldOfView
+	);
+	al.init_sources(config.verticalResolution);
+	al.init_sine_buffers(
+	    config.verticalResolution,
+	    config.sampleLength,
+	    config.frequencyMin,
+	    config.frequencyMax
+	);
 	// add buffers to sources
-	for (int i = 0; i < height; i++) {
+	for (int i = 0; i < config.verticalResolution; i++) {
 		al.source_set_buffer(i, i);
 		al.source_set_gain(i, 0.f);
 		al.source_play(i);
 	}
 	// openCV
-	opencv_module cv(width, height);
+	opencv_module cv(config.horizontalResolution, config.verticalResolution);
 	cv.set_current_frame(input->get_frame());
-	int x = 0;
 	float intensity = 0.f;
+	int delayLength = config.cycleLength / config.horizontalResolution;
+	time_point<steady_clock> start;
+	int x = 0;
 	while (1) {
-		for (x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
+		for (x = 0; x < config.horizontalResolution; x++) {
+			start = high_resolution_clock::now();
+			for (int y = 0; y < config.verticalResolution; y++) {
 				al.source_set_pos(x, y);
 				intensity = cv.get_intensity(x, y);
-				cout << "intensity: " << intensity << endl;
 				al.source_set_gain(y, intensity);
 			}
 			al.source_print_position(0);
-			Sleep(1);
+			delay(delayLength, start);
 		}
 		cv.set_current_frame(input->get_frame());
 		for (x; x >= 0; x--) {
-			for (int y = 0; y < height; y++) {
+			start = high_resolution_clock::now();
+			for (int y = 0; y < config.verticalResolution; y++) {
 				al.source_set_pos(x, y);
 				intensity = cv.get_intensity(x, y);
-				cout << "intensity: " << intensity << endl;
 				al.source_set_gain(y, intensity);
 			}
 			al.source_print_position(0);
-			Sleep(1);
+			delay(delayLength, start);
 		}
 		cv.set_current_frame(input->get_frame());
 	}
 	return 0;
 }
 
-//float get_grid_intensity(Mat image, int x, int y);
+/**
+ * @brief      Delay function that waits for delayLength before returning.
+ *
+ * @param[in]  delayLength  The delay length the length in milliseconds that you would like to delay for.
+ * @param[in]  start        (Optional) The start the time_point where you want to delay from.
+ */
+void visual_audio_algorithm::delay(int delayLength, time_point<steady_clock> start) {
+	time_point<steady_clock> now;
+	duration<double> elapsedTime;
+	do  {
+		now = high_resolution_clock::now();
+		elapsedTime = now - start;
+	} while (duration_cast<milliseconds>(elapsedTime).count() < delayLength);
+}
