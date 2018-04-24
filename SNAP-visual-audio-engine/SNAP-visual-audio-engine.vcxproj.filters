@@ -21,9 +21,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="input_module.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared_mem_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
