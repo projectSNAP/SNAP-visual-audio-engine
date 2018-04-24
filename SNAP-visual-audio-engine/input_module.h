@@ -4,12 +4,7 @@
 class input_module
 {
 public:
-	input_module();
-	~input_module();
-	void set_dimensions(int width, int height);
+	input_module() {};
 	virtual cv::Mat get_frame() = 0;
-protected:
-	int frameX;
-	int frameY;
 };
 

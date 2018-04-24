@@ -45,7 +45,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>"$(OPENCV_DIR)\lib";"$(OPENAL_DIR)\libs\Win64";"$(OPENAL_DIR)\include";%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world340d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world340d.lib;OpenAL32.lib;SharedMemoryDLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(OPENCV_DIR)\bin\opencv_world340d.dll" "$(OutDir)"
@@ -73,7 +73,6 @@
   <ItemGroup>
     <ClCompile Include="config_module.cpp" />
     <ClCompile Include="file_input.cpp" />
-    <ClCompile Include="input_module.cpp" />
     <ClCompile Include="BlenderToDepthMapDLL.cpp" />
     <ClCompile Include="openal_module.cpp" />
     <ClCompile Include="opencv_module.cpp" />
@@ -91,6 +90,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="openal_module.h" />
     <ClInclude Include="opencv_module.h" />
+    <ClInclude Include="SharedMemoryDLL.h" />
     <ClInclude Include="shared_mem_input.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
