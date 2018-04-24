@@ -1,5 +1,5 @@
 #include "shared_mem_input.h"
-#include "BlenderToDepthMapDLL.h"
+#include "SharedMemoryDLL.h"
 #include <iostream>
 
 using namespace cv;
@@ -8,14 +8,23 @@ using namespace std;
 cv::Mat shared_mem_input::get_frame()
 {
 	// Open the shared memory space for reading.
-	void* PointerToBuf = OpenDepthBufMapFileToRead(frameX, frameY);
-	int* dst = new int[frameX * frameY];
-	memcpy(dst, ReadDepthMapBufFile(PointerToBuf), frameX * frameY * 4);
-	Mat image = Mat(frameX, frameY, CV_16UC2, dst);
+	Mat image;
+	int width, height;
+	void* ptrToSharedMemory = ReadSharedMemorySpace(width, height);
+	int sizeOfImage = width *height * 4;
+	delete(data);
+	data = new int[sizeOfImage];
+	memcpy(data, (char*)ptrToSharedMemory, sizeOfImage);
+	image = Mat(height, width, CV_16UC2, data);
+	UnmapPointerToSharedMemory((int*)ptrToSharedMemory);
 
 	if (!image.data) // Check for invalid input
 	{
 		wcerr << "Could not open or find the image" << std::endl;
 	}
 	return image;
+}
+
+shared_mem_input::~shared_mem_input() {
+	delete(data);
 }

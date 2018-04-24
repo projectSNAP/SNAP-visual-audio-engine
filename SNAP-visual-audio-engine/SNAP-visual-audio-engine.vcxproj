@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{C5B3A5C1-9A34-49FE-BF83-E33661BD293C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -45,7 +45,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>"$(OPENCV_DIR)\lib";"$(OPENAL_DIR)\libs\Win64";"$(OPENAL_DIR)\include";%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world340d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world340d.lib;OpenAL32.lib;SharedMemoryDLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(OPENCV_DIR)\bin\opencv_world340d.dll" "$(OutDir)"
@@ -91,6 +91,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="openal_module.h" />
     <ClInclude Include="opencv_module.h" />
+    <ClInclude Include="SharedMemoryDLL.h" />
     <ClInclude Include="shared_mem_input.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
