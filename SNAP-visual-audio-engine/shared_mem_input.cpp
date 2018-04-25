@@ -1,7 +1,5 @@
 #include "shared_mem_input.h"
 #include "SharedMemoryDLL.h"
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
 using namespace cv;
