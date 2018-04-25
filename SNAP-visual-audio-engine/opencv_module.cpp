@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
+#include <cmath>
 using namespace cv;
 
 opencv_module::opencv_module(int width, int height)
@@ -40,7 +41,10 @@ float opencv_module::get_intensity(int x, int y)
 	{
 		Mat regionOfInterest(currentFrame, Rect(ROIWidth * x, ROIHeight * y, ROIWidth, ROIHeight));
 		Scalar avgPixelIntensity = mean(regionOfInterest);
+		// Get the pixel intensity and normalize it to range (0.0-1.0)
 		intensity = (float)avgPixelIntensity.val[0] / 255.f;
+		// Calculate the normal Rolloff
+		intensity = exp(6.908 * intensity) / 1000;
 	}
 	catch (cv::Exception & e)
 	{
