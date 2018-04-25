@@ -65,7 +65,7 @@ openal_module::openal_module(int width, int height, float FOV)
 	alcMakeContextCurrent(context);
 	al_check_error();
 	// Set default listener orientation is specifiec by an "at" vector and an "up" vector
-	// y+ = right, x- = forward, z+ = up
+	// +y = right, -x = forward, +z = up
 	// see https://www.openal.org/documentation/OpenAL_Programmers_Guide.pdf
 	// for info on listener orientation section 4.2.1.
 	ALfloat listenerOri[] = { -1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
@@ -263,13 +263,12 @@ void openal_module::source_set_pos(int x, int y) {
 		y = yMax - 1;
 	else if (y < 0)
 		y = 0;
-	// Find the start angle since theta starts at 0 behind the listener
-	// we have to start at an offset to center the FOV infront of the
-	// listener.
-	float startAngle = (((2.f * M_PI) - horizontalFOV) / 2.f);
+	// Find the start angle since theta starts at 0 (-x axis) behind the listener
+	// and we want our x axis to start on the left side of the listener
+	float startAngle = (horizontalFOV / 2.0) + M_PI;
 	// The angle increment is the size (in radians) of each x increment.
 	float angleIncrement = horizontalFOV / xMax;
-	float theta = startAngle + (angleIncrement / 2.f) + (angleIncrement * x);
+	float theta = startAngle - (angleIncrement / 2.0) - (angleIncrement * x);
 	float phi = deg_to_rad(90);
 	float rho = 10.f;
 	// Get the new coordinates in cartesian
