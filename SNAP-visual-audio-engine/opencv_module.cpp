@@ -23,28 +23,28 @@ void opencv_module::set_current_frame(cv::Mat frame)
 float opencv_module::get_intensity(int x, int y)
 {
 	float intensity = 0.f;
-		// Make sure x and y are within bounds
-		if (x >= xMax)
-			x = xMax - 1;
-		else if (x < 0)
-			x = 0;
-		if (y >= yMax)
-			y = yMax - 1;
-		else if (y < 0)
-			y = 0;
-		// Calculate region of interest dimensions from new frame
-		int ROIWidth = currentFrame.cols / xMax;
-		int ROIHeight = currentFrame.rows / yMax;
-		// Find the intensity at x and y
-		try
-		{
-				Mat regionOfInterest(currentFrame, Rect(ROIWidth * x, ROIHeight * y, ROIWidth, ROIHeight));
-				Scalar avgPixelIntensity = mean(regionOfInterest);
-				intensity = (float)avgPixelIntensity.val[0] / 255.f;
-		}
-		catch (cv::Exception & e)
-		{
-			std::cerr << e.msg << std::endl; // output exception message
-		}
+	// Make sure x and y are within bounds
+	if (x >= xMax)
+		x = xMax - 1;
+	else if (x < 0)
+		x = 0;
+	if (y >= yMax)
+		y = yMax - 1;
+	else if (y < 0)
+		y = 0;
+	// Calculate region of interest dimensions from new frame
+	int ROIWidth = currentFrame.cols / xMax;
+	int ROIHeight = currentFrame.rows / yMax;
+	// Find the intensity at x and y
+	try
+	{
+		Mat regionOfInterest(currentFrame, Rect(ROIWidth * x, ROIHeight * y, ROIWidth, ROIHeight));
+		Scalar avgPixelIntensity = mean(regionOfInterest);
+		intensity = (float)avgPixelIntensity.val[0] / 255.f;
+	}
+	catch (cv::Exception & e)
+	{
+		std::cerr << e.msg << std::endl; // output exception message
+	}
 	return intensity;
 }
