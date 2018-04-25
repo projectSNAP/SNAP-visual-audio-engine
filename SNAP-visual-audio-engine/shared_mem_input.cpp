@@ -1,5 +1,7 @@
 #include "shared_mem_input.h"
 #include "SharedMemoryDLL.h"
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
 using namespace cv;
@@ -12,7 +14,7 @@ cv::Mat shared_mem_input::get_frame()
 	int width, height;
 	// Get the dimensions of the image
 	void* ptrToSharedMemory = ReadSharedMemorySpace(width, height);
-	int sizeOfImage = width *height * 4;
+	int sizeOfImage = width * height * 4;
 	// Delete the previous image if it exists
 	if (data) {
 		delete(data);
@@ -21,14 +23,23 @@ cv::Mat shared_mem_input::get_frame()
 	data = new int[sizeOfImage];
 	memcpy(data, (char*)ptrToSharedMemory, sizeOfImage);
 	image = Mat(height, width, CV_16UC2, data);
-	// TODO: is it neccessary to unmap the pointer each time?
-	// Possibly store pointer as
 	UnmapPointerToSharedMemory((int*)ptrToSharedMemory);
 	// Check for invalid input
 	if (!image.data)
 	{
 		// TODO: better error message.
 		wcerr << "Could not open or find the image" << std::endl;
+	} else {
+		// extract the greyscale image from channel 0.
+		Mat channels[2];
+		split(image, channels);
+		// invert the colors because unity shader creates depth inverted.
+		Mat inverted;
+		bitwise_not(channels[0], inverted);
+		// flip the image because unity shader creates depth flipped.
+		Mat flipped;
+		flip(inverted, flipped, 0);
+		return flipped;
 	}
 	return image;
 }
