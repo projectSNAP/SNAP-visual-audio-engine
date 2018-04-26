@@ -33,34 +33,22 @@ int visual_audio_algorithm::bilateral(config_type config) {
 	}
 	// openCV
 	opencv_module cv(config.horizontalResolution, config.verticalResolution);
-	cv.set_current_frame(input->get_frame());
 	float intensity = 0.f;
 	int delayLength = config.cycleLength / config.horizontalResolution;
 	time_point<steady_clock> start;
 	int x = 0;
 	while (1) {
+		cv.set_current_frame(input->get_frame());
 		for (x = 0; x < config.horizontalResolution; x++) {
 			start = high_resolution_clock::now();
 			for (int y = 0; y < config.verticalResolution; y++) {
-				al.source_set_pos(x, y);
 				intensity = cv.get_intensity(x, y);
+				intensity = opencv_module::logarithmic_rolloff(intensity);
+				al.source_set_pos(x, y);
 				al.source_set_gain(y, intensity);
 			}
-			al.source_print_position(0);
 			delay(delayLength, start);
 		}
-		cv.set_current_frame(input->get_frame());
-		for (x; x >= 0; x--) {
-			start = high_resolution_clock::now();
-			for (int y = 0; y < config.verticalResolution; y++) {
-				al.source_set_pos(x, y);
-				intensity = cv.get_intensity(x, y);
-				al.source_set_gain(y, intensity);
-			}
-			al.source_print_position(0);
-			delay(delayLength, start);
-		}
-		cv.set_current_frame(input->get_frame());
 	}
 	return 0;
 }

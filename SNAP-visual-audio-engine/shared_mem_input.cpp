@@ -11,6 +11,8 @@ cv::Mat shared_mem_input::get_frame()
 	Mat image;
 	int width, height;
 	// Get the dimensions of the image
+	// TODO: have ReadSharedMemorySpace return null if there is nothing to read,
+	// so we know to end the program gracefully instead of a crash.
 	void* ptrToSharedMemory = ReadSharedMemorySpace(width, height);
 	int sizeOfImage = width * height * 4;
 	// Delete the previous image if it exists
@@ -20,7 +22,7 @@ cv::Mat shared_mem_input::get_frame()
 	// Copy the new image from shared memory
 	data = new int[sizeOfImage];
 	memcpy(data, (char*)ptrToSharedMemory, sizeOfImage);
-	image = Mat(height, width, CV_16UC2, data);
+	image = Mat(height, width, CV_8UC2, data);
 	UnmapPointerToSharedMemory((int*)ptrToSharedMemory);
 	// Check for invalid input
 	if (!image.data)

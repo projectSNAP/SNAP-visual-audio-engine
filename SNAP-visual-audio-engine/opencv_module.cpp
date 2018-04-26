@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "opencv_module.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -40,15 +41,22 @@ float opencv_module::get_intensity(int x, int y)
 	try
 	{
 		Mat regionOfInterest(currentFrame, Rect(ROIWidth * x, ROIHeight * y, ROIWidth, ROIHeight));
-		Scalar avgPixelIntensity = mean(regionOfInterest);
+
+		Scalar avgPixelIntensity = cv::mean(regionOfInterest);
 		// Get the pixel intensity and normalize it to range (0.0-1.0)
-		intensity = (float)avgPixelIntensity.val[0] / 255.f;
-		// Calculate the normal Rolloff
-		intensity = exp(6.908 * intensity) / 1000;
+		intensity = (float)avgPixelIntensity.val[0] / 255.0;
 	}
 	catch (cv::Exception & e)
 	{
 		std::cerr << e.msg << std::endl; // output exception message
 	}
 	return intensity;
+}
+
+float opencv_module::rolloff(float x, float base) {
+	return (pow(base, x) - 1.0) / (base - 1.0);
+}
+
+float opencv_module::logarithmic_rolloff(float x) {
+	return rolloff(x, M_E);
 }
