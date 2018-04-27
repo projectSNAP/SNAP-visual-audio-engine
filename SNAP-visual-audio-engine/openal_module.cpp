@@ -109,14 +109,13 @@ void openal_module::init_sine_buffers(int count, float length, float frequencyMi
 	alGenBuffers(count, buffers);
 	int sampleSize = SAMPLE_RATE * length;
 	short *samples = new short[sampleSize];
-	float currFreq = frequencyMin;
-	freqInc = 1.059463; // This is how much of a frequency increase to get to the next note in a 12 note scale.
-	for (int buffer = count - 1; buffer >= 0; buffer--) {
+	float currFreq = frequencyMax;
+	for (int buffer = 0; buffer < count; buffer++) {
 		for (int i = 0; i < sampleSize; ++i) {
 			samples[i] = ((SHRT_MAX) * sin(2 * M_PI * i * currFreq / SAMPLE_RATE));
 		}
 		alBufferData(buffers[buffer], AL_FORMAT_MONO16, samples, sampleSize * sizeof(short), SAMPLE_RATE);
-		currFreq = currFreq * freqInc;
+		currFreq -= freqInc;
 		al_check_error();
 	}
 }
