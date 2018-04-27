@@ -17,19 +17,19 @@ config_type load(string filePath)
 	json jsonConfig;
 	config_type newConfig;
 	try {
+		cout << "Opening Config File: " << filePath << endl;
 		ifstream inputFile(filePath);
 		inputFile >> jsonConfig;
-		set_int_config(jsonConfig, "horizontalResolution", newConfig.horizontalResolution);
-		set_int_config(jsonConfig, "verticalResolution", newConfig.verticalResolution);
-		set_int_config(jsonConfig, "cycleLength", newConfig.cycleLength);
-		set_float_config(jsonConfig, "fieldOfView", newConfig.fieldOfView);
-		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
-		set_float_config(jsonConfig, "amplitude", newConfig.amplitude);
-		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
-		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
-		set_scantype_config(jsonConfig, "scanType", newConfig.scanType);
-		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
-		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
+		set_int_config(jsonConfig, "HorizontalResolution", newConfig.horizontalResolution);
+		set_int_config(jsonConfig, "VerticalResolution", newConfig.verticalResolution);
+		set_int_config(jsonConfig, "CycleLength", newConfig.cycleLength);
+		set_float_config(jsonConfig, "FieldOfView", newConfig.fieldOfView);
+		set_float_config(jsonConfig, "SampleLength", newConfig.sampleLength);
+		set_float_config(jsonConfig, "FrequencyMin", newConfig.frequencyMin);
+		set_float_config(jsonConfig, "FrequencyMax", newConfig.frequencyMax);
+		set_scantype_config(jsonConfig, "ScanType", newConfig.scanType);
+		set_soundgradient_config(jsonConfig, "DistanceIndicator", newConfig.distanceIndicator);
+		set_soundgradient_config(jsonConfig, "HeightIndicator", newConfig.heightIndicator);
 	}
 	catch (json::parse_error &e) {
 		cerr << e.what() << endl;
@@ -138,7 +138,6 @@ void print(config_type config) {
 	printf("%d \n", config.cycleLength);
 	printf("%f \n", config.fieldOfView);
 	printf("%f \n", config.sampleLength);
-	printf("%f \n", config.amplitude);
 	printf("%f \n", config.frequencyMin);
 	printf("%f \n", config.frequencyMax);
 	printf("%d \n", config.scanType);

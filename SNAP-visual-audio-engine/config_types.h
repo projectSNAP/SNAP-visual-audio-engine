@@ -57,7 +57,6 @@ typedef struct config_type {
 		verticalResolution = 16;
 		fieldOfView = 90.f;
 		sampleLength = 1.f;
-		amplitude = 1.f;
 		frequencyMin = 110.f;
 		frequencyMax = 440.f;
 		cycleLength = 1000;
