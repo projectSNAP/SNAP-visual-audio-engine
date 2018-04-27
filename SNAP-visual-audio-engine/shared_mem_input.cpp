@@ -22,7 +22,7 @@ cv::Mat shared_mem_input::get_frame()
 	// Copy the new image from shared memory
 	data = new int[sizeOfImage];
 	memcpy(data, (char*)ptrToSharedMemory, sizeOfImage);
-	image = Mat(height, width, CV_8UC2, data);
+	image = Mat(height, width, CV_16UC2, data);
 	UnmapPointerToSharedMemory((int*)ptrToSharedMemory);
 	// Check for invalid input
 	if (!image.data)
