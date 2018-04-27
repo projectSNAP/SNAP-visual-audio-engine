@@ -65,7 +65,6 @@ int visual_audio_algorithm::lateral(config_type config) {
 				al.source_set_pos(x, y);
 				al.source_set_gain(y, intensity);
 			}
-			al.source_print_position(0);
 			delay(delayLength, start);
 		}
 	}
