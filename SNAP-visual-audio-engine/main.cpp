@@ -10,5 +10,5 @@ int main() {
 	shared_mem_input *input = new shared_mem_input();
 	visual_audio_algorithm algorithm(input);
 	config::config_type configs = config::load("");
-	algorithm.bilateral(configs);
+	algorithm.lateral(configs);
 }

@@ -1,6 +1,7 @@
 #include "visual_audio_algorithm.h"
 #include "openal_module.h"
 #include "opencv_module.h"
+#include <windows.h>
 
 using namespace std::chrono;
 using namespace config;
@@ -11,7 +12,7 @@ visual_audio_algorithm::visual_audio_algorithm(input_module *input_module)
 	input = input_module;
 }
 
-int visual_audio_algorithm::bilateral(config_type config) {
+int visual_audio_algorithm::lateral(config_type config) {
 	// openAL
 	openal_module al(
 	    config.horizontalResolution,
@@ -33,13 +34,30 @@ int visual_audio_algorithm::bilateral(config_type config) {
 	}
 	// openCV
 	opencv_module cv(config.horizontalResolution, config.verticalResolution);
+	// create needed variables
 	float intensity = 0.f;
 	int delayLength = config.cycleLength / config.horizontalResolution;
 	time_point<steady_clock> start;
 	int x = 0;
+	// Lateral right or lateral left?
+	int xStart;
+	int direction;
+	switch (config.scanType) {
+		case config::LATERAL_LEFT: {
+			direction = -1;
+			xStart = config.horizontalResolution;
+		}
+		break;
+		case config::LATERAL_RIGHT:
+		default: {
+			direction = 1;
+			xStart = 0;
+		}
+	}
+	// audio algorithm
 	while (1) {
 		cv.set_current_frame(input->get_frame());
-		for (x = 0; x < config.horizontalResolution; x++) {
+		for (x = xStart; (x < config.horizontalResolution && x >= 0); x += direction) {
 			start = high_resolution_clock::now();
 			for (int y = 0; y < config.verticalResolution; y++) {
 				intensity = cv.get_intensity(x, y);
@@ -47,6 +65,7 @@ int visual_audio_algorithm::bilateral(config_type config) {
 				al.source_set_pos(x, y);
 				al.source_set_gain(y, intensity);
 			}
+			al.source_print_position(0);
 			delay(delayLength, start);
 		}
 	}

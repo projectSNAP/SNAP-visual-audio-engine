@@ -41,7 +41,6 @@ float opencv_module::get_intensity(int x, int y)
 	try
 	{
 		Mat regionOfInterest(currentFrame, Rect(ROIWidth * x, ROIHeight * y, ROIWidth, ROIHeight));
-
 		Scalar avgPixelIntensity = cv::mean(regionOfInterest);
 		// Get the pixel intensity and normalize it to range (0.0-1.0)
 		intensity = (float)avgPixelIntensity.val[0] / 65535.0;
