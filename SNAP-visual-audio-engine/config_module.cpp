@@ -20,16 +20,16 @@ config_type load(string filePath)
 		cout << "Opening Config File: " << filePath << endl;
 		ifstream inputFile(filePath);
 		inputFile >> jsonConfig;
-		set_int_config(jsonConfig, "savedHorizontalResolution", newConfig.horizontalResolution);
-		set_int_config(jsonConfig, "savedVerticalResolution", newConfig.verticalResolution);
-		set_int_config(jsonConfig, "savedCycleLength", newConfig.cycleLength);
-		set_float_config(jsonConfig, "savedFieldOfView", newConfig.fieldOfView);
-		set_float_config(jsonConfig, "savedSampleLength", newConfig.sampleLength);
-		set_float_config(jsonConfig, "savedFrequencyMin", newConfig.frequencyMin);
-		set_float_config(jsonConfig, "savedFrequencyMax", newConfig.frequencyMax);
-		set_scantype_config(jsonConfig, "savedScanningType", newConfig.scanType);
-		set_soundgradient_config(jsonConfig, "savedDistanceIndicator", newConfig.distanceIndicator);
-		set_soundgradient_config(jsonConfig, "savedHeightIndicator", newConfig.heightIndicator);
+		set_int_config(jsonConfig, "horizontalResolution", newConfig.horizontalResolution);
+		set_int_config(jsonConfig, "verticalResolution", newConfig.verticalResolution);
+		set_int_config(jsonConfig, "cycleLength", newConfig.cycleLength);
+		set_float_config(jsonConfig, "fieldOfView", newConfig.fieldOfView);
+		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
+		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
+		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
+		set_scantype_config(jsonConfig, "scanningType", newConfig.scanType);
+		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
+		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
 	}
 	catch (json::parse_error &e) {
 		cerr << e.what() << endl;
