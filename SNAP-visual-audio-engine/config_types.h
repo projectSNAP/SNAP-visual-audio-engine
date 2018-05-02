@@ -4,41 +4,21 @@
 
 namespace config {
 
-const int scanningTypeStringsCount = 6;
-
 typedef enum ScanningType {
-	LATERAL_RIGHT,
-	LATERAL_LEFT,
-	BILATERAL,
-	SPLIT_LATERAL_OUT,
-	SPLIT_LATERAL_IN,
-	SPLIT_BILATERAL,
+	LATERAL_RIGHT = 0,
+	LATERAL_LEFT = 1,
+	BILATERAL = 2,
+	SPLIT_LATERAL_OUT = 3,
+	SPLIT_LATERAL_IN = 4,
+	SPLIT_BILATERAL = 5
 } ScanningType;
 
-const std::string scanningTypeStrings[scanningTypeStringsCount] = {
-	"LATERAL_RIGHT",
-	"LATERAL_LEFT",
-	"BILATERAL",
-	"SPLIT_LATERAL_OUT",
-	"SPLIT_LATERAL_IN",
-	"SPLIT_BILATERAL"
-};
-
-const int soundGradientCount = 4;
-
 typedef enum SoundGradient {
-	FREQUENCY,
-	SINE_TO_SQUARE,
-	SQUARE_TO_SINE,
-	VOLUME
+	FREQUENCY = 0,
+	SINE_TO_SQUARE = 1,
+	SQUARE_TO_SINE = 2,
+	VOLUME = 3
 } SoundGradient;
-
-const std::string soundGradientStrings[soundGradientCount] = {
-	"FREQUENCY",
-	"SINE_TO_SQUARE",
-	"SQUARE_TO_SINE",
-	"VOLUME"
-};
 
 typedef struct config_type {
 	int horizontalResolution;
@@ -65,4 +45,5 @@ typedef struct config_type {
 		heightIndicator = FREQUENCY;
 	}
 } config_type;
+
 }

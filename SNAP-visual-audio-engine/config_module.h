@@ -15,8 +15,8 @@ bool is_number(nlohmann::json jsonConfig, std::string name);
 bool is_string(nlohmann::json jsonConfig, std::string name);
 void set_int_config(nlohmann::json jsonConfig, std::string name, int &destination);
 void set_float_config(nlohmann::json jsonConfig, std::string name, float &destination);
-void set_scanningType_config(nlohmann::json jsonConfig, std::string name, ScanningType &destination);
-void set_soundgradient_config(nlohmann::json jsonConfig, std::string name, SoundGradient &destination);
+void set_scanning_type_config(nlohmann::json jsonConfig, std::string name, ScanningType &destination);
+void set_sound_gradient_config(nlohmann::json jsonConfig, std::string name, SoundGradient &destination);
 
 void print(config_type config);
 }

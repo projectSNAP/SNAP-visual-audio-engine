@@ -27,40 +27,15 @@ config_type load(string filePath)
 		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
 		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
 		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
-		set_scanningType_config(jsonConfig, "scanningType", newConfig.scanningType);
-		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
-		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
+		set_scanning_type_config(jsonConfig, "scanningType", newConfig.scanningType);
+		set_sound_gradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
+		set_sound_gradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
 	}
 	catch (json::parse_error &e) {
 		cerr << e.what() << endl;
 		cerr << "Error reading file, defaults will be used." << endl;
 	}
 	return newConfig;
-}
-
-bool iequals(const string a, const string b)
-{
-	for (unsigned int i = 0; a[i] != '\0'; ++i)
-		if (tolower(a[i]) != tolower(b[i]))
-			return false;
-	return true;
-}
-
-int string_in_array(const string str, const string* arr, int arrSize) {
-	for (int i = 0; i < arrSize; i ++) {
-		if (iequals(arr[i], str)) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-bool is_scanningType(const string str) {
-	return string_in_array(str, scanningTypeStrings, scanningTypeStringsCount);
-}
-
-bool is_soundgradient(const string str) {
-	return string_in_array(str, soundGradientStrings, soundGradientCount);
 }
 
 bool is_number(json jsonConfig, const string name) {
@@ -104,23 +79,69 @@ void set_float_config(json config, const string name, float &destination) {
 	}
 }
 
-void set_scanningType_config(json config, const string name, ScanningType &destination) {
+void set_scanning_type_config(json config, const string name, ScanningType &destination) {
+	bool error = false;
 	if (is_number(config, name)) {
-		destination = config[name];
-		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+		switch ((int)config[name]) {
+		case LATERAL_RIGHT:
+			destination = LATERAL_RIGHT;
+			break;
+		case LATERAL_LEFT:
+			destination = LATERAL_LEFT;
+			break;
+		case BILATERAL:
+			destination = BILATERAL;
+			break;
+		case SPLIT_LATERAL_OUT:
+			destination = SPLIT_LATERAL_OUT;
+			break;
+		case SPLIT_LATERAL_IN:
+			destination = SPLIT_LATERAL_IN;
+			break;
+		case SPLIT_BILATERAL:
+			destination = SPLIT_BILATERAL;
+			break;
+		default:
+			error = true;
+		}
+	} else {
+		error = true;
 	}
-	else {
+
+	if (error) {
 		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	} else {
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
 	}
 }
 
-void set_soundgradient_config(json config, string name, SoundGradient &destination) {
+void set_sound_gradient_config(json config, string name, SoundGradient &destination) {
+	bool error = false;
 	if (is_number(config, name)) {
-		destination = config[name];
-		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+		switch ((int)config[name]) {
+		case FREQUENCY:
+			destination = FREQUENCY;
+			break;
+		case SINE_TO_SQUARE:
+			destination = SINE_TO_SQUARE;
+			break;
+		case SQUARE_TO_SINE:
+			destination = SQUARE_TO_SINE;
+			break;
+		case VOLUME:
+			destination = VOLUME;
+			break;
+		default:
+			error = true;
+		}
+	} else {
+		error = true;
 	}
-	else {
+
+	if (error) {
 		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	} else {
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
 	}
 }
 
