@@ -17,6 +17,7 @@ config_type load(string filePath)
 	json jsonConfig;
 	config_type newConfig;
 	try {
+		cout << "Opening Config File: " << filePath << endl;
 		ifstream inputFile(filePath);
 		inputFile >> jsonConfig;
 		set_int_config(jsonConfig, "horizontalResolution", newConfig.horizontalResolution);
@@ -24,43 +25,17 @@ config_type load(string filePath)
 		set_int_config(jsonConfig, "cycleLength", newConfig.cycleLength);
 		set_float_config(jsonConfig, "fieldOfView", newConfig.fieldOfView);
 		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
-		set_float_config(jsonConfig, "amplitude", newConfig.amplitude);
 		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
 		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
-		set_scantype_config(jsonConfig, "scanType", newConfig.scanType);
-		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
-		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
+		set_scanning_type_config(jsonConfig, "scanningType", newConfig.scanningType);
+		set_sound_gradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
+		set_sound_gradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
 	}
 	catch (json::parse_error &e) {
 		cerr << e.what() << endl;
 		cerr << "Error reading file, defaults will be used." << endl;
 	}
 	return newConfig;
-}
-
-bool iequals(const string a, const string b)
-{
-	for (unsigned int i = 0; a[i] != '\0'; ++i)
-		if (tolower(a[i]) != tolower(b[i]))
-			return false;
-	return true;
-}
-
-int string_in_array(const string str, const string* arr, int arrSize) {
-	for (int i = 0; i < arrSize; i ++) {
-		if (iequals(arr[i], str)) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-bool is_scantype(const string str) {
-	return string_in_array(str, scanTypeStrings, scanTypeStringsCount);
-}
-
-bool is_soundgradient(const string str) {
-	return string_in_array(str, soundGradientStrings, soundGradientCount);
 }
 
 bool is_number(json jsonConfig, const string name) {
@@ -104,31 +79,69 @@ void set_float_config(json config, const string name, float &destination) {
 	}
 }
 
-void set_scantype_config(json config, const string name, ScanType &destination) {
-	if (is_string(config, name)) {
-		string x = config[name];
-		int result = string_in_array(x, scanTypeStrings, scanTypeStringsCount);
-		if (result != -1) {
-			destination = (ScanType)result;
-			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+void set_scanning_type_config(json config, const string name, ScanningType &destination) {
+	bool error = false;
+	if (is_number(config, name)) {
+		switch ((int)config[name]) {
+		case LATERAL_RIGHT:
+			destination = LATERAL_RIGHT;
+			break;
+		case LATERAL_LEFT:
+			destination = LATERAL_LEFT;
+			break;
+		case BILATERAL:
+			destination = BILATERAL;
+			break;
+		case SPLIT_LATERAL_OUT:
+			destination = SPLIT_LATERAL_OUT;
+			break;
+		case SPLIT_LATERAL_IN:
+			destination = SPLIT_LATERAL_IN;
+			break;
+		case SPLIT_BILATERAL:
+			destination = SPLIT_BILATERAL;
+			break;
+		default:
+			error = true;
 		}
-		else {
-			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
-		}
+	} else {
+		error = true;
+	}
+
+	if (error) {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	} else {
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
 	}
 }
 
-void set_soundgradient_config(json config, string name, SoundGradient &destination) {
-	if (is_string(config, name)) {
-		string x = config[name];
-		int result = string_in_array(x, soundGradientStrings, soundGradientCount);
-		if (result != -1) {
-			destination = (SoundGradient)result;
-			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+void set_sound_gradient_config(json config, string name, SoundGradient &destination) {
+	bool error = false;
+	if (is_number(config, name)) {
+		switch ((int)config[name]) {
+		case FREQUENCY:
+			destination = FREQUENCY;
+			break;
+		case SINE_TO_SQUARE:
+			destination = SINE_TO_SQUARE;
+			break;
+		case SQUARE_TO_SINE:
+			destination = SQUARE_TO_SINE;
+			break;
+		case VOLUME:
+			destination = VOLUME;
+			break;
+		default:
+			error = true;
 		}
-		else {
-			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
-		}
+	} else {
+		error = true;
+	}
+
+	if (error) {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
+	} else {
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
 	}
 }
 
@@ -138,10 +151,9 @@ void print(config_type config) {
 	printf("%d \n", config.cycleLength);
 	printf("%f \n", config.fieldOfView);
 	printf("%f \n", config.sampleLength);
-	printf("%f \n", config.amplitude);
 	printf("%f \n", config.frequencyMin);
 	printf("%f \n", config.frequencyMax);
-	printf("%d \n", config.scanType);
+	printf("%d \n", config.scanningType);
 	printf("%d \n", config.distanceIndicator);
 	printf("%d \n", config.heightIndicator);
 }

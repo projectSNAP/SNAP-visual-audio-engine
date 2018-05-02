@@ -4,41 +4,21 @@
 
 namespace config {
 
-const int scanTypeStringsCount = 6;
-
-typedef enum ScanType {
-	LATERAL_RIGHT,
-	LATERAL_LEFT,
-	BILATERAL,
-	SPLIT_LATERAL_OUT,
-	SPLIT_LATERAL_IN,
-	SPLIT_BILATERAL,
-} ScanType;
-
-const std::string scanTypeStrings[scanTypeStringsCount] = {
-	"LATERAL_RIGHT",
-	"LATERAL_LEFT",
-	"BILATERAL",
-	"SPLIT_LATERAL_OUT",
-	"SPLIT_LATERAL_IN",
-	"SPLIT_BILATERAL"
-};
-
-const int soundGradientCount = 4;
+typedef enum ScanningType {
+	LATERAL_RIGHT = 0,
+	LATERAL_LEFT = 1,
+	BILATERAL = 2,
+	SPLIT_LATERAL_OUT = 3,
+	SPLIT_LATERAL_IN = 4,
+	SPLIT_BILATERAL = 5
+} ScanningType;
 
 typedef enum SoundGradient {
-	FREQUENCY,
-	SINE_TO_SQUARE,
-	SQUARE_TO_SINE,
-	VOLUME
+	FREQUENCY = 0,
+	SINE_TO_SQUARE = 1,
+	SQUARE_TO_SINE = 2,
+	VOLUME = 3
 } SoundGradient;
-
-const std::string soundGradientStrings[soundGradientCount] = {
-	"FREQUENCY",
-	"SINE_TO_SQUARE",
-	"SQUARE_TO_SINE",
-	"VOLUME"
-};
 
 typedef struct config_type {
 	int horizontalResolution;
@@ -49,7 +29,7 @@ typedef struct config_type {
 	float amplitude;
 	float frequencyMin;
 	float frequencyMax;
-	ScanType scanType;
+	ScanningType scanningType;
 	SoundGradient distanceIndicator;
 	SoundGradient heightIndicator;
 	config_type() {
@@ -57,13 +37,13 @@ typedef struct config_type {
 		verticalResolution = 16;
 		fieldOfView = 90.f;
 		sampleLength = 1.f;
-		amplitude = 1.f;
 		frequencyMin = 110.f;
 		frequencyMax = 440.f;
 		cycleLength = 1000;
-		scanType = BILATERAL;
+		scanningType = BILATERAL;
 		distanceIndicator = VOLUME;
 		heightIndicator = FREQUENCY;
 	}
 } config_type;
+
 }
