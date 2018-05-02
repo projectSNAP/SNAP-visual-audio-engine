@@ -20,16 +20,16 @@ config_type load(string filePath)
 		cout << "Opening Config File: " << filePath << endl;
 		ifstream inputFile(filePath);
 		inputFile >> jsonConfig;
-		set_int_config(jsonConfig, "HorizontalResolution", newConfig.horizontalResolution);
-		set_int_config(jsonConfig, "VerticalResolution", newConfig.verticalResolution);
-		set_int_config(jsonConfig, "CycleLength", newConfig.cycleLength);
-		set_float_config(jsonConfig, "FieldOfView", newConfig.fieldOfView);
-		set_float_config(jsonConfig, "SampleLength", newConfig.sampleLength);
-		set_float_config(jsonConfig, "FrequencyMin", newConfig.frequencyMin);
-		set_float_config(jsonConfig, "FrequencyMax", newConfig.frequencyMax);
-		set_scantype_config(jsonConfig, "ScanType", newConfig.scanType);
-		set_soundgradient_config(jsonConfig, "DistanceIndicator", newConfig.distanceIndicator);
-		set_soundgradient_config(jsonConfig, "HeightIndicator", newConfig.heightIndicator);
+		set_int_config(jsonConfig, "savedHorizontalResolution", newConfig.horizontalResolution);
+		set_int_config(jsonConfig, "savedVerticalResolution", newConfig.verticalResolution);
+		set_int_config(jsonConfig, "savedCycleLength", newConfig.cycleLength);
+		set_float_config(jsonConfig, "savedFieldOfView", newConfig.fieldOfView);
+		set_float_config(jsonConfig, "savedSampleLength", newConfig.sampleLength);
+		set_float_config(jsonConfig, "savedFrequencyMin", newConfig.frequencyMin);
+		set_float_config(jsonConfig, "savedFrequencyMax", newConfig.frequencyMax);
+		set_scantype_config(jsonConfig, "savedScanningType", newConfig.scanType);
+		set_soundgradient_config(jsonConfig, "savedDistanceIndicator", newConfig.distanceIndicator);
+		set_soundgradient_config(jsonConfig, "savedHeightIndicator", newConfig.heightIndicator);
 	}
 	catch (json::parse_error &e) {
 		cerr << e.what() << endl;
@@ -105,30 +105,22 @@ void set_float_config(json config, const string name, float &destination) {
 }
 
 void set_scantype_config(json config, const string name, ScanType &destination) {
-	if (is_string(config, name)) {
-		string x = config[name];
-		int result = string_in_array(x, scanTypeStrings, scanTypeStringsCount);
-		if (result != -1) {
-			destination = (ScanType)result;
-			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
-		}
-		else {
-			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
-		}
+	if (is_number(config, name)) {
+		destination = config[name];
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+	}
+	else {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
 	}
 }
 
 void set_soundgradient_config(json config, string name, SoundGradient &destination) {
-	if (is_string(config, name)) {
-		string x = config[name];
-		int result = string_in_array(x, soundGradientStrings, soundGradientCount);
-		if (result != -1) {
-			destination = (SoundGradient)result;
-			clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
-		}
-		else {
-			cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
-		}
+	if (is_number(config, name)) {
+		destination = config[name];
+		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
+	}
+	else {
+		cerr << "Config \"" << name << "\" could not be loaded. Default value " << destination << " will be used." << endl;
 	}
 }
 
