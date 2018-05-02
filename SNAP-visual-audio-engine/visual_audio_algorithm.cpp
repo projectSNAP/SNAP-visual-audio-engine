@@ -1,7 +1,6 @@
 #include "visual_audio_algorithm.h"
 #include "openal_module.h"
 #include "opencv_module.h"
-#include <windows.h>
 
 using namespace std::chrono;
 using namespace config;
