@@ -8,7 +8,7 @@ using namespace cv;
 
 cv::Mat file_input::get_frame() {
 	// Get a picture from a file next to the exe called soundtest.jpg
-	char* filename = "C:\\Users\\dusti\\Pictures\\diagonal.jpg";
+	char* filename = "C:\\Users\\dusti\\Pictures\\test.jpg";
 	Mat image;
 	Mat *splitImage = NULL;
 	image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);   // Read the file
