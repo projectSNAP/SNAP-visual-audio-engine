@@ -27,7 +27,7 @@ config_type load(string filePath)
 		set_float_config(jsonConfig, "sampleLength", newConfig.sampleLength);
 		set_float_config(jsonConfig, "frequencyMin", newConfig.frequencyMin);
 		set_float_config(jsonConfig, "frequencyMax", newConfig.frequencyMax);
-		set_scantype_config(jsonConfig, "scanningType", newConfig.scanType);
+		set_scanningType_config(jsonConfig, "scanningType", newConfig.scanningType);
 		set_soundgradient_config(jsonConfig, "distanceIndicator", newConfig.distanceIndicator);
 		set_soundgradient_config(jsonConfig, "heightIndicator", newConfig.heightIndicator);
 	}
@@ -55,8 +55,8 @@ int string_in_array(const string str, const string* arr, int arrSize) {
 	return -1;
 }
 
-bool is_scantype(const string str) {
-	return string_in_array(str, scanTypeStrings, scanTypeStringsCount);
+bool is_scanningType(const string str) {
+	return string_in_array(str, scanningTypeStrings, scanningTypeStringsCount);
 }
 
 bool is_soundgradient(const string str) {
@@ -104,7 +104,7 @@ void set_float_config(json config, const string name, float &destination) {
 	}
 }
 
-void set_scantype_config(json config, const string name, ScanType &destination) {
+void set_scanningType_config(json config, const string name, ScanningType &destination) {
 	if (is_number(config, name)) {
 		destination = config[name];
 		clog << "Config \"" << name << "\" was successfully set to " << destination << "." << endl;
@@ -132,7 +132,7 @@ void print(config_type config) {
 	printf("%f \n", config.sampleLength);
 	printf("%f \n", config.frequencyMin);
 	printf("%f \n", config.frequencyMax);
-	printf("%d \n", config.scanType);
+	printf("%d \n", config.scanningType);
 	printf("%d \n", config.distanceIndicator);
 	printf("%d \n", config.heightIndicator);
 }

@@ -4,18 +4,18 @@
 
 namespace config {
 
-const int scanTypeStringsCount = 6;
+const int scanningTypeStringsCount = 6;
 
-typedef enum ScanType {
+typedef enum ScanningType {
 	LATERAL_RIGHT,
 	LATERAL_LEFT,
 	BILATERAL,
 	SPLIT_LATERAL_OUT,
 	SPLIT_LATERAL_IN,
 	SPLIT_BILATERAL,
-} ScanType;
+} ScanningType;
 
-const std::string scanTypeStrings[scanTypeStringsCount] = {
+const std::string scanningTypeStrings[scanningTypeStringsCount] = {
 	"LATERAL_RIGHT",
 	"LATERAL_LEFT",
 	"BILATERAL",
@@ -49,7 +49,7 @@ typedef struct config_type {
 	float amplitude;
 	float frequencyMin;
 	float frequencyMax;
-	ScanType scanType;
+	ScanningType scanningType;
 	SoundGradient distanceIndicator;
 	SoundGradient heightIndicator;
 	config_type() {
@@ -60,7 +60,7 @@ typedef struct config_type {
 		frequencyMin = 110.f;
 		frequencyMax = 440.f;
 		cycleLength = 1000;
-		scanType = BILATERAL;
+		scanningType = BILATERAL;
 		distanceIndicator = VOLUME;
 		heightIndicator = FREQUENCY;
 	}

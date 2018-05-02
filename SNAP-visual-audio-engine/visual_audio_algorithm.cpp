@@ -42,7 +42,7 @@ int visual_audio_algorithm::lateral(config_type config) {
 	// Lateral right or lateral left?
 	int xStart;
 	int direction;
-	switch (config.scanType) {
+	switch (config.scanningType) {
 		case config::LATERAL_LEFT: {
 			direction = -1;
 			xStart = config.horizontalResolution;
