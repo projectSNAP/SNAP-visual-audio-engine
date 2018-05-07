@@ -36,6 +36,9 @@
     <ClCompile Include="opencv_module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="get_exe_directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
