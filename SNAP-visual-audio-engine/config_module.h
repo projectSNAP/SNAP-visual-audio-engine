@@ -3,6 +3,11 @@
 #include "config_types.h"
 #include "json.hpp"
 
+/**
+ * This module contains all of the functions necessary for reading
+ * configurations for the Visual Audio Engine configurations from JSON formatted
+ * files.
+ */
 namespace config {
 // TODO: validate each input to make sure it's within a reasonable range
 // such as 0 - 16 for verticalResolution.

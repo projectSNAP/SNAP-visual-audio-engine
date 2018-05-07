@@ -7,6 +7,7 @@ using namespace std;
 using namespace nlohmann;
 
 namespace config {
+
 /**
  * @brief      Loads a configuration from a .json file.
  *
