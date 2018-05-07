@@ -89,10 +89,9 @@ openal_module::~openal_module()
 }
 
 
-// TODO: add the ability to create buffers of varying waveforms
-
 /**
- * @brief      Create an array of buffers that contain a sine wave of increasing frequency.
+ * @brief      Create an array of buffers that contain a sine wave, each of
+ *             increasing frequency.
  *
  * @param[in]  count         The number of buffers to create.
  * @param[in]  length        The length of each buffer in seconds.
@@ -120,8 +119,9 @@ void openal_module::init_sine_buffers(int count, float length, float frequencyMi
 	}
 }
 
+
 /**
- * @brief      Creates sources.
+ * @brief      OpenAL code for creating sources.
  */
 void openal_module::init_sources(int count)
 {
@@ -170,7 +170,7 @@ void openal_module::source_set_buffer(int source, int buffer)
 }
 
 /**
- * @brief      Tells the source to start playing.
+ * @brief      Tells the source to start playing it's assigned buffer.
  *
  * @param[in]  source  The source
  */
@@ -192,15 +192,6 @@ void openal_module::source_pause(int source)
 	al_check_error();
 }
 
-void openal_module::source_add_pitch(int source, float addPitch) {
-	ALfloat currentPitch;
-	alGetSourcef(sources[source], AL_PITCH, &currentPitch);
-	al_check_error();
-	currentPitch += addPitch;
-	alSourcef(sources[source], AL_PITCH, currentPitch);
-	al_check_error();
-}
-
 void openal_module::source_set_pitch(int source, float pitch) {
 	alSourcef(sources[source], AL_PITCH, pitch);
 	al_check_error();
@@ -218,40 +209,6 @@ float openal_module::source_get_gain(int source) {
 	return gain;
 }
 
-void openal_module::source_add_gain(int source, float addGain) {
-	ALfloat gain = source_get_gain(source);
-	gain += addGain;
-	source_set_gain(source, gain);
-}
-/**
- * @brief      Moves a source around within the bounds of the FOV.
- *
- * @param[in]  source     The source
- * @param[in]  latitude   The latitude in radians
- * @param[in]  longitude  The longitude in radians
- */
-void openal_module::source_move(int source, float deltaTheta, float deltaPhi)
-{
-	// get position of source
-	float oldX;
-	float oldY;
-	float oldZ;
-	alGetSource3f(sources[source], AL_POSITION, &oldX, &oldY, &oldZ);
-	al_check_error();
-	float oldTheta = cartesian_to_spherical_theta(oldX, oldY, oldZ);
-	float oldPhi = cartesian_to_spherical_phi(oldX, oldY, oldZ);
-	float newTheta = normalize_angle(oldTheta + deltaTheta);
-	float newPhi = normalize_angle(oldPhi + deltaPhi);
-	float newX = 0.f;
-	float newY = 0.f;
-	float newZ = 0.f;
-	spherical_to_cartesian(10.f, newTheta, newPhi, &newX, &newY, &newZ);
-	alSource3f(sources[source], AL_POSITION, newX, newY, newZ);
-	al_check_error();
-	// if new position is outside bounds, set new position to bounds
-	// TODO: figure out how to keep latitude and longitude within bounds
-	// of field-of-view.
-}
 
 void openal_module::source_set_pos(int x, int y) {
 	// Make sure x and y are within bounds
@@ -349,12 +306,26 @@ void openal_module::spherical_to_cartesian(float rho, float theta, float phi, fl
 	*z = zero_threshold(rho * cos(phi));
 }
 
+/**
+ * @brief      Threshold for determining if a float value is essentially 0. If
+ *             the number is below the threshold return true 0.0, else return
+ *             the number.
+ *
+ * @param[in]  num   The number
+ */
 float openal_module::zero_threshold(float num) {
 	if (fabs(num) < 0.000010)
 		num = 0.f;
 	return num;
 }
 
+/**
+ * @brief      Normalize angle to be within the range of (0.0 to 2*PI). 
+ *
+ * @param[in]  angle  The angle
+ *
+ * @return     normalizedAngle The equivalent normalized angle.
+ */
 float openal_module::normalize_angle(float angle) {
 	float fullCircle = 2 * M_PI;
 	fmod(angle, fullCircle);

@@ -2,6 +2,17 @@
 #include "al.h"
 #include "alc.h"
 
+/**
+ * @brief      A module contains all of the functions required to utilize openAL
+ *             in an audio algorithm without needing to write all of the
+ *             boilerplate code. It also handles programmatic generation of sine
+ *             waves through the init_sine_buffers function. As well as an
+ *             abstraction of source movement in source_set_pos. This
+ *             abstraction accepts an x and y coordinate that correlates with
+ *             the vertical and horizontal ‘resolution’ of the module and moves
+ *             the sources incrementally in front of the listener within the
+ *             field of view using spherical coordinates.
+ */
 class openal_module
 {
 public:
@@ -15,13 +26,10 @@ public:
 	void source_play(int source);
 	void source_stop(int source);
 	void source_pause(int source);
-	void source_move(int source, float latitude, float longitude);
 	void source_set_pos(int x, int y);
-	void source_add_pitch(int source, float addPitch);
 	void source_set_pitch(int source, float addPitch);
 	void source_set_gain(int source, float gain);
 	float source_get_gain(int source);
-	void source_add_gain(int source, float addGain);
 	float source_get_theta(int source);
 	void source_print_position(int source);
 	static float deg_to_rad(float x);
