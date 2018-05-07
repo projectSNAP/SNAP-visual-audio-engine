@@ -15,13 +15,19 @@ opencv_module::opencv_module(int width, int height)
 
 void opencv_module::set_current_frame(cv::Mat frame)
 {
-	// Get the current frame
 	currentFrame = frame;
-	// namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
-	// imshow( "Display window", *currentFrame);
-	// waitKey(2000);
 }
 
+/**
+ * @brief      Gets the pixel intensity of a certain grid point in the current
+ *             frame, this intensity should be used to control the
+ *             DistanceIndicator on a sound algorithm.
+ *
+ * @param[in]  x     x location on the grid.
+ * @param[in]  y     y location on the grid.
+ *
+ * @return     The intensity.
+ */
 float opencv_module::get_intensity(int x, int y)
 {
 	float intensity = 0.f;
@@ -52,10 +58,24 @@ float opencv_module::get_intensity(int x, int y)
 	return intensity;
 }
 
+/**
+ * @brief      Rolloff helper functions to be used to modify the pixel
+ *             intensity.
+ *
+ * @param[in]  x     float that you want to apply rolloff to. Should be within
+ *                   range of (0-1).
+ * @param[in]  base  The base (e.g. e)
+ */
 float opencv_module::rolloff(float x, float base) {
 	return (pow(base, x) - 1.0) / (base - 1.0);
 }
 
+/**
+ * @brief      Convenience function for logarithmic rolloff. Note: the vast
+ *             majority of human perception is on a logarithmic scale, so if you
+ *             want sound increase to sound right it must be increasing
+ *             logarithmicly.
+ */
 float opencv_module::logarithmic_rolloff(float x) {
 	return rolloff(x, M_E);
 }
